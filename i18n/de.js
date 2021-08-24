@@ -5,10 +5,15 @@ module.exports = {
   root: {
     title: 'Notify'
   },
-  common: {},
+  common: {
+    ok: 'ok'
+  },
   pages: {
     subscribe: {
-      notifyMe: 'Benachrichtige mich wegen {title}.'
+      notifyMe: 'Benachrichtige mich wegen {title}.',
+      registerDevice: 'Dieses Gerät als dauerhaften Empfänger Ihrer Benachrichtigungen hinzufügen?',
+      notification: 'benachrichtigung',
+      email: 'email'
     }
   },
   errors: {},

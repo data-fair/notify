@@ -7,9 +7,9 @@
       {{ err }}
     </template>
     <template v-else>
-      Ajouter cet appareil comme destinataire permanent de vos notifications ?
+      {{ $t('pages.subscribe.registerDevice') }}
       <v-btn text class="mx-2" @click="register">
-        confirmer
+        {{ $t('common.ok') }}
       </v-btn>
     </template>
   </v-alert>
