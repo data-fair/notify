@@ -2,9 +2,13 @@ import ReconnectingWebSocket from 'reconnecting-websocket'
 import eventBus from '../assets/event-bus.js'
 
 export default ({ store, env }) => {
-  console.log('Configure WS', env.wsPublicUrl)
+  // reconstruct this env var that we used to have but lost when implementing multi-domain exposition
+  const wsPublicUrl = (window.location.origin + env.basePath)
+    .replace('http:', 'ws:').replace('https:', 'wss:')
+
+  console.log('Configure WS', wsPublicUrl)
   if (window.WebSocket) {
-    const ws = new ReconnectingWebSocket(env.wsPublicUrl)
+    const ws = new ReconnectingWebSocket(wsPublicUrl)
     const subscriptions = {}
     let ready = false
     ws.addEventListener('open', () => {

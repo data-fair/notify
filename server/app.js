@@ -7,9 +7,7 @@ const proxy = require('http-proxy-middleware')
 const http = require('http')
 const session = require('@koumoul/sd-express')({
   directoryUrl: config.directoryUrl,
-  privateDirectoryUrl: config.privateDirectoryUrl,
-  publicUrl: config.publicUrl,
-  cookieDomain: config.sessionDomain
+  privateDirectoryUrl: config.privateDirectoryUrl
 })
 const status = require('./status')
 const ws = require('./ws')
@@ -31,7 +29,6 @@ app.use(bodyParser.json())
 app.get('/api/v1/status', auth(), status.status)
 app.get('/api/v1/ping', status.ping)
 
-app.use('/api/v1/session', session.router)
 app.use('/api/v1/topics', require('./router/topics'))
 app.use('/api/v1/subscriptions', auth(), require('./router/subscriptions'))
 app.use('/api/v1/notifications', require('./router/notifications'))
@@ -42,7 +39,6 @@ app.use('/api/v1/identities', require('./router/identities'))
 let wss
 exports.start = async () => {
   const nuxt = await require('./nuxt')()
-  app.use(session.loginCallback)
   app.use(nuxt)
   const { db, client } = await require('./utils/db').init()
   app.set('db', db)

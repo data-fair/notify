@@ -75,8 +75,7 @@ module.exports = {
     }
   },
   env: {
-    publicUrl: config.publicUrl,
-    wsPublicUrl: config.wsPublicUrl,
+    basePath: config.basePath,
     directoryUrl: config.directoryUrl,
     theme: config.theme,
     i18nLocales: config.i18nLocales

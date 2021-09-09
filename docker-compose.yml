@@ -1,7 +1,7 @@
 version: '3'
 services:
   sd:
-    image: koumoul/simple-directory:1
+    image: koumoul/simple-directory:multi-domain
     network_mode: host
     environment:
       - DEBUG=webhooks
