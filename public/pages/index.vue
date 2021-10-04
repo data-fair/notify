@@ -15,7 +15,7 @@
       <div>
         <v-btn
           color="primary"
-          href="https://github.com/koumoul-dev/notify"
+          href="https://github.com/data-fair/notify"
           target="_blank"
         >
           Sur Github
