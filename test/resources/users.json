@@ -1,7 +1,10 @@
 [{
     "id": "superadmin",
     "email": "superadmin@test.com",
-    "isAdmin": true
+    "isAdmin": true,
+    "password": {
+      "clear": "superpasswd"
+    }
 }, {
     "id": "user1",
     "email": "user1@test.com"

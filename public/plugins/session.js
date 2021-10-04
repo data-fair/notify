@@ -1,8 +1,16 @@
-export default ({ store, app, env }) => {
-  store.commit('setAny', { env: { ...env } })
+export default async ({ store, app, env, $vuetify, route }) => {
+  let publicUrl = window.location.origin + env.basePath
+  if (publicUrl.endsWith('/')) publicUrl = publicUrl.substr(0, -1)
+  store.commit('setAny', {
+    env: {
+      ...env,
+      // reconstruct this env var that we used to have but lost when implementing multi-domain exposition
+      publicUrl
+    }
+  })
   store.dispatch('session/init', {
     cookies: app.$cookies,
-    baseUrl: env.publicUrl + '/api/v1/session'
+    directoryUrl: env.directoryUrl
   })
   store.dispatch('session/loop', app.$cookies)
 }
