@@ -1,6 +1,6 @@
 {
   "name": "notify",
-  "version": "0.5.1",
+  "version": "1.0.0",
   "description": "A simple server to manage notifications feeds for our users. Notifications are stored and pushed to various channels.",
   "main": "index.js",
   "scripts": {
