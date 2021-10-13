@@ -27,8 +27,8 @@
   "homepage": "https://github.com/koumoul-dev/notify#readme",
   "dependencies": {
     "@koumoul/nuxt-config-inject": "^0.4.2",
-    "@koumoul/sd-express": "1.0.0",
-    "@koumoul/sd-vue": "1.2.0",
+    "@koumoul/sd-express": "1.1.1",
+    "@koumoul/sd-vue": "1.2.2",
     "@koumoul/vjsf": "^2.0.3",
     "@nuxtjs/axios": "^5.8.0",
     "@nuxtjs/vuetify": "^1.12.1",

@@ -17,16 +17,17 @@ router.get('', auth(), asyncWrap(async (req, res, next) => {
   const sort = { date: -1 }
   const [skip, size] = findUtils.pagination(req.query)
   const query = { 'recipient.id': req.user.id }
-  let pointer
+  const notifications = db.collection('notifications')
+  let pointer, resultsPromise
   if (size > 0) {
     pointer = (await db.collection('pointers')
       .findOneAndReplace({ 'recipient.id': req.user.id }, { recipient: { id: req.user.id, name: req.user.name }, date: new Date().toISOString() }, { returnOriginal: true, upsert: true })).value
+    resultsPromise = notifications.find(query).limit(size).skip(skip).sort(sort).toArray()
   } else {
     pointer = await db.collection('pointers').findOne({ 'recipient.id': req.user.id })
+    resultsPromise = new Promise(resolve => resolve([]))
   }
 
-  const notifications = db.collection('notifications')
-  const resultsPromise = notifications.find(query).limit(size).skip(skip).sort(sort).toArray()
   const countPromise = notifications.countDocuments(query)
   const countNewPromise = pointer ? notifications.countDocuments({ ...query, date: { $gt: pointer.date } }) : countPromise
   const [results, count, countNew] = await Promise.all([resultsPromise, countPromise, countNewPromise])
