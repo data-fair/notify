@@ -77,7 +77,7 @@ export default {
     ...mapState('session', ['user']),
     ...mapGetters('session', ['activeAccount']),
     schema () {
-      const schema = JSON.parse(JSON.stringify(schemaBuilder(process.env.i18nLocales.split(','))))
+      const schema = JSON.parse(JSON.stringify(schemaBuilder(process.env.i18n.locales.split(','))))
       Object.keys(schema.properties).forEach(k => {
         if (schema.properties[k].readOnly) delete schema.properties[k]
       })

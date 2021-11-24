@@ -33,7 +33,7 @@ export default {
   computed: {
     ...mapState(['env']),
     locales () {
-      return this.env.i18nLocales.split(',').filter(l => !!this.$i18n.locales.find(loc => loc.code === l))
+      return this.env.i18n.locales.split(',')
     }
   }
 }
