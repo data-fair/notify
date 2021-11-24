@@ -45,7 +45,7 @@ module.exports = {
   router: {
     base: config.basePath
   },
-  modules: ['@nuxtjs/axios', 'cookie-universal-nuxt', ['nuxt-i18n', {
+  modules: ['@nuxtjs/axios', 'cookie-universal-nuxt', ['@nuxtjs/i18n', {
     seo: false,
     locales,
     defaultLocale: config.i18n.defaultLocale,
