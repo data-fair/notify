@@ -3,7 +3,6 @@ const bodyParser = require('body-parser')
 const config = require('config')
 const cookieParser = require('cookie-parser')
 const eventToPromise = require('event-to-promise')
-const proxy = require('http-proxy-middleware')
 const http = require('http')
 const session = require('@koumoul/sd-express')({
   directoryUrl: config.directoryUrl,
@@ -19,6 +18,7 @@ app.set('session', session)
 const server = http.createServer(app)
 
 if (process.env.NODE_ENV === 'development') {
+  const proxy = require('http-proxy-middleware')
   // Create a mono-domain environment with other services in dev
   app.use('/simple-directory', proxy({ target: 'http://localhost:8080', pathRewrite: { '^/simple-directory': '' } }))
 }
