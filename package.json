@@ -43,7 +43,7 @@
     "flat": "^5.0.2",
     "iframe-resizer": "^4.2.3",
     "moment": "^2.24.0",
-    "mongodb": "^3.6.4",
+    "mongodb": "^4.2.0",
     "node-pushnotifications": "^1.2.0",
     "nodemon": "^1.19.4",
     "nuxt": "^2.15.7",
