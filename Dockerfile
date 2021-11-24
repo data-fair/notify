@@ -14,7 +14,6 @@ ADD contract contract
 ADD config config
 
 # Adding UI files
-ADD i18n i18n
 ADD public public
 ADD nuxt.config.js .
 RUN npm run build
