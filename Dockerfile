@@ -1,11 +1,10 @@
-FROM koumoul/webapp-base:1.10.1
+FROM node:16.13.0-alpine3.13
 MAINTAINER "contact@koumoul.com"
 
-ARG VERSION
-ENV VERSION=$VERSION
 ENV NODE_ENV production
-
 WORKDIR /webapp
+
+ADD LICENSE .
 ADD package.json .
 ADD package-lock.json .
 RUN npm install --production && node-prune
@@ -22,10 +21,14 @@ RUN npm run build
 
 # Adding server files
 ADD server server
+ADD README.md VERSION.json* .
 
 ADD README.md .
 
 VOLUME /webapp/security
 EXPOSE 8080
 
-CMD ["node", "server"]
+# Check the HTTP server is started as health indicator
+HEALTHCHECK --start-period=4m --interval=10s --timeout=3s CMD curl -f http://localhost:8080/ || exit 1
+
+CMD ["node", "--max-http-header-size", "64000", "server"]
