@@ -7,7 +7,7 @@ WORKDIR /webapp
 ADD LICENSE .
 ADD package.json .
 ADD package-lock.json .
-RUN npm install --production && node-prune
+RUN npm install --production
 ADD nodemon.json .
 
 ADD contract contract
