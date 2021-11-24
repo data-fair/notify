@@ -30,15 +30,15 @@ module.exports = (locales) => ({
     outputs: {
       type: 'array',
       title: 'Sorties',
-      default: ['web'],
+      default: ['devices'],
       items: {
         type: 'string',
         oneOf: [{
-          const: 'web',
-          title: 'Notification Web'
+          const: 'devices',
+          title: 'recevoir la notification sur vos appareils configurés'
         }, {
           const: 'email',
-          title: 'Envoi de mail'
+          title: 'recevoir la notification par email'
         }]
       }
     },

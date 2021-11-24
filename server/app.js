@@ -41,6 +41,7 @@ exports.start = async () => {
   const nuxt = await require('./nuxt')()
   app.use(nuxt)
   const { db, client } = await require('./utils/db').init()
+  await require('../upgrade')(db)
   app.set('db', db)
   app.set('client', client)
   app.set('push', await require('./utils/push').init(db))

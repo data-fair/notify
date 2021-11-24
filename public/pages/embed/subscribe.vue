@@ -1,21 +1,32 @@
 <template>
   <v-container fluid data-iframe-height>
-    <div style="display:flex">
+    <v-row v-if="register">
       <register-device />
-    </div>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-subheader class="px-0" style="height: auto;">
+          {{ $tc('notifyMe', topics.length) }}
+        </v-subheader>
+      </v-col>
+    </v-row>
     <v-row v-for="topic in topics" :key="topic.key" class="ma-0">
-      <subscribe :topic="topic" :no-sender="!!$route.query.noSender" />
+      <subscribe :topic="topic" :no-sender="!!$route.query.noSender" @register="register = true" />
     </v-row>
   </v-container>
 </template>
 
-<script>
-import Subscribe from '~/components/subscribe.vue'
-import RegisterDevice from '~/components/register-device.vue'
+<i18n lang="yaml">
+fr:
+  notifyMe: " | Me notifier de cet évènement : | Me notifier de ces évènements :"
+</i18n>
 
+<script>
 export default {
   layout: 'embed',
-  components: { Subscribe, RegisterDevice },
+  data () {
+    return { register: false }
+  },
   computed: {
     topics () {
       const keys = this.$route.query.key.split(',')

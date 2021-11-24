@@ -48,6 +48,11 @@ router.get('', asyncWrap(async (req, res, next) => {
 // Create a subscription
 router.post('', asyncWrap(async (req, res, next) => {
   const db = req.app.get('db')
+  // maintain compatibility with deprecated "web" output
+  if (req.body.outputs && req.body.outputs.includes('web')) {
+    req.body.outputs = req.body.outputs.filter(o => o !== 'web').concat(['devices'])
+  }
+
   const valid = validate(req.body)
   if (!valid) return res.status(400).send(validate.errors)
   req.body.title = req.body.title || `${req.body.topic.title} (${req.body.recipient.name})`

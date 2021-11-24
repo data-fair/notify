@@ -1,11 +1,13 @@
 const webpack = require('webpack')
-const i18n = require('./i18n')
 let config = { ...require('config') }
 config.basePath = new URL(config.publicUrl + '/').pathname
-config.i18nMessages = i18n.messages
-config.i18nLocales = config.i18n.locales.join(',')
 
-const fr = require('vuetify/es5/locale/fr').default
+const locales = ['fr', 'en', 'de', 'it', 'es', 'pt']
+
+const vuetifyLocales = locales.reduce((a, locale) => {
+  a[locale] = require('vuetify/es5/locale/' + locale).default
+  return a
+}, {})
 
 if (process.env.NODE_ENV === 'production') {
   const nuxtConfigInject = require('@koumoul/nuxt-config-inject')
@@ -45,18 +47,16 @@ module.exports = {
   },
   modules: ['@nuxtjs/axios', 'cookie-universal-nuxt', ['nuxt-i18n', {
     seo: false,
-    // cannot come from config as it must be defined at build time (routes are impacted
-    // we will override some of it at runtime using env.i18n
-    locales: i18n.locales,
-    defaultLocale: i18n.defaultLocale,
-    vueI18n: {
-      fallbackLocale: i18n.defaultLocale,
-      messages: config.i18nMessages
-    },
+    locales,
+    defaultLocale: config.i18n.defaultLocale,
+    vueI18nLoader: true,
+    strategy: 'no_prefix',
     detectBrowserLanguage: {
       useCookie: true,
-      cookieKey: 'i18n_lang',
-      alwaysRedirect: true
+      cookieKey: 'i18n_lang'
+    },
+    vueI18n: {
+      fallbackLocale: config.i18n.defaultLocale
     }
   }]],
   axios: {
@@ -73,7 +73,7 @@ module.exports = {
       }
     },
     lang: {
-      locales: { fr },
+      locales: vuetifyLocales,
       current: 'fr'
     }
   },
@@ -81,7 +81,7 @@ module.exports = {
     basePath: config.basePath,
     directoryUrl: config.directoryUrl,
     theme: config.theme,
-    i18nLocales: config.i18nLocales
+    i18n: config.i18n
   },
   head: {
     title: 'Notify',

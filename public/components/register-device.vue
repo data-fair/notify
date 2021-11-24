@@ -1,19 +1,28 @@
 <template>
   <v-alert
-    v-if="ready && (!subscription || err)" prominent dark :color="err ? 'error' : 'accent'" dense
-    class="mb-0"
+    v-if="ready && (!subscription || err)"
+    :type="err ? 'error' : 'accent'"
+    dense
+    class="ma-1"
+    :class="{'py-0 pr-0' : !err}"
   >
     <template v-if="err">
       {{ err }}
     </template>
     <template v-else>
-      {{ $t('pages.subscribe.registerDevice') }}
-      <v-btn text class="mx-2" @click="register">
-        {{ $t('common.ok') }}
+      {{ $t('registerDevice') }}
+      <v-btn text class="ml-1" @click="register">
+        {{ $t('ok') }}
       </v-btn>
     </template>
   </v-alert>
 </template>
+
+<i18n lang="yaml">
+fr:
+  ok: ok
+  registerDevice: Ajouter cet appareil comme destinataire permanent de vos notifications ?
+</i18n>
 
 <script>
 
