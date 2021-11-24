@@ -18,7 +18,7 @@
         class="ml-10 mt-0"
         :label="$t('devices')"
         value="devices"
-        @change="sendSubscription"
+        @change="sendSubscription(subscription)"
       />
       <v-checkbox
         v-model="subscription.outputs"
@@ -27,7 +27,7 @@
         class="ml-10 mt-0"
         :label="$t('email')"
         value="email"
-        @change="sendSubscription"
+        @change="sendSubscription(subscription)"
       />
     </template>
   </v-col>
@@ -79,23 +79,24 @@ export default {
     async switchSubscription () {
       this.loading = true
       if (!this.subscription) {
-        this.subscription = {
+        const subscription = {
           recipient: { id: this.user.id, name: this.user.name },
           topic: this.topic,
           outputs: [],
           locale: this.$i18n.locale
         }
-        if (!this.noSender) this.subscription.sender = this.activeAccount
-        await this.sendSubscription()
+        if (!this.noSender) subscription.sender = this.activeAccount
+        await this.sendSubscription(subscription)
+        await this.refresh()
       } else {
         await this.$axios.$delete('api/v1/subscriptions/' + this.subscription._id)
         this.subscription = null
       }
       this.loading = false
     },
-    async sendSubscription () {
-      await this.$axios.$post('api/v1/subscriptions', this.subscription)
-      if (this.subscription?.outputs.includes('devices')) this.$emit('register')
+    async sendSubscription (subscription) {
+      await this.$axios.$post('api/v1/subscriptions', subscription)
+      if (subscription?.outputs.includes('devices')) this.$emit('register')
     }
   }
 }

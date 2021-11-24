@@ -40,6 +40,7 @@ module.exports = {
     }
   },
   i18n: {
-    locales: ['fr', 'en', 'es', 'pt', 'it', 'de']
+    locales: 'fr,en',
+    defaultLocale: 'fr'
   }
 }
