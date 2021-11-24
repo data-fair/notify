@@ -1,6 +1,6 @@
 const webpack = require('webpack')
-let config = require('config')
 const i18n = require('./i18n')
+let config = { ...require('config') }
 config.basePath = new URL(config.publicUrl + '/').pathname
 config.i18nMessages = i18n.messages
 config.i18nLocales = config.i18n.locales.join(',')
@@ -14,11 +14,15 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 module.exports = {
+  target: 'server',
   ssr: false,
+  components: true,
   srcDir: 'public/',
   buildDir: 'nuxt-dist',
   build: {
-    transpile: [/@koumoul/], // Necessary for "à la carte" import of vuetify components
+    // Necessary for "à la carte" import of vuetify components
+    transpile: [/@koumoul/],
+    // always the same url to fetch static resource, event in multi-domain mode
     publicPath: config.publicUrl + '/_nuxt/',
     extend (config, { isServer, isDev, isClient }) {
       // config.optimization.minimize = false
@@ -56,8 +60,7 @@ module.exports = {
     }
   }]],
   axios: {
-    browserBaseURL: config.publicUrl + '/',
-    baseURL: `http://localhost:${config.port}/`
+    browserBaseURL: config.basePath
   },
   buildModules: ['@nuxtjs/vuetify'],
   vuetify: {
