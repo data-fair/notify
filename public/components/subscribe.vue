@@ -45,7 +45,9 @@ import { mapState, mapGetters } from 'vuex'
 export default {
   props: {
     topic: { type: Object, default: null },
-    noSender: { type: Boolean, default: false }
+    noSender: { type: Boolean, default: false },
+    icon: { type: String, default: null },
+    urlTemplate: { type: String, default: null }
   },
   data: () => ({
     subscription: null,
@@ -72,8 +74,13 @@ export default {
         params.senderId = this.activeAccount.id
       }
       this.subscription = (await this.$axios.$get('api/v1/subscriptions', { params })).results[0]
-      if (this.subscription) this.subscription.locale = this.$i18n.locale
-      if (this.subscription?.outputs.includes('devices')) this.$emit('register')
+      if (this.subscription) {
+        if (this.subscription.outputs.includes('devices')) this.$emit('register')
+        this.subscription.locale = this.$i18n.locale
+        if (this.icon) this.subscription.icon = this.icon
+        if (this.urlTemplate) this.subscription.urlTemplate = this.urlTemplate
+      }
+
       this.loading = false
     },
     async switchSubscription () {
@@ -86,6 +93,8 @@ export default {
           locale: this.$i18n.locale
         }
         if (!this.noSender) subscription.sender = this.activeAccount
+        if (this.icon) subscription.icon = this.icon
+        if (this.urlTemplate) subscription.urlTemplate = this.urlTemplate
         await this.sendSubscription(subscription)
         await this.refresh()
       } else {

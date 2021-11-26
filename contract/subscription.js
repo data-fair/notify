@@ -53,6 +53,10 @@ module.exports = (locales) => ({
       default: 'private',
       readOnly: true
     },
+    icon: {
+      type: 'string',
+      title: 'Icone'
+    },
     created: modifier,
     updated: modifier
   }

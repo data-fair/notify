@@ -11,7 +11,7 @@
       </v-col>
     </v-row>
     <v-row v-for="topic in topics" :key="topic.key" class="ma-0">
-      <subscribe :topic="topic" :no-sender="!!$route.query.noSender" @register="register = true" />
+      <subscribe :topic="topic" :no-sender="!!$route.query.noSender" :icon="$route.query.icon" :url-template="$route.query['url-template']" @register="register = true" />
     </v-row>
   </v-container>
 </template>
