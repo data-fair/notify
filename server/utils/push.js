@@ -6,6 +6,7 @@ const config = require('config')
 const webpush = require('web-push')
 const PushNotifications = require('node-pushnotifications')
 const useragent = require('useragent')
+const dayjs = require('dayjs')
 const asyncWrap = require('./async-wrap')
 const debug = require('debug')('notifications')
 
@@ -45,6 +46,12 @@ exports.init = async (db) => {
     if (!pushSub) return []
     const errors = []
     for (const registration of pushSub.registrations) {
+      if (registration.disabled) continue
+      if (registration.disabledUntil) {
+        if (registration.disabledUntil > dayjs().toISOString()) continue
+        delete registration.disabledUntil
+      }
+
       const pushNotif = {
         ...notification,
         badge: config.theme.notificationBadge || (config.publicUrl + '/badge-72x72.png'),
@@ -57,15 +64,23 @@ exports.init = async (db) => {
       if (error) {
         errors.push(error)
         if (error.error && error.error.statusCode === 410) {
-          console.log('registration has unsubscribed or expired, remove it', error.error.body || error.error.response || error.error.statusCode, JSON.stringify(registration))
-          pushSub.registrations = pushSub.registrations.filter(r => !equalReg(r.id, error.regId))
-        } else if (error.error && error.error.statusCode === 500 && error.error.body && error.error.body.includes('transient internal error')) {
-          // TODO we should implement exponential backoff retry in this case
-          console.log('push failed with transient error, ignore it', error.error.body, JSON.stringify(registration))
+          console.log('registration has unsubscribed or expired, disable it', error.error.body || error.error.response || error.error.statusCode, JSON.stringify(registration))
+          registration.disabled = 'gone' // cf https://developer.mozilla.org/fr/docs/Web/HTTP/Status/410
+          delete registration.lastErrors
         } else {
-          console.warn('Unmanaged error, remove potentially broken registration to prevent spamming', error)
-          pushSub.registrations = pushSub.registrations.filter(r => !equalReg(r.id, error.regId))
+          registration.lastErrors = registration.lastErrors || []
+          registration.lastErrors.push(error.error?.statusCode ? error.error : error?.errorMsg)
+          if (registration.lastErrors.length >= 10) {
+            registration.disabled = 'errors'
+            console.warn('registration returned too many errors, disable it', error.error, JSON.stringify(registration))
+          } else {
+            registration.disabledUntil = dayjs().add(Math.ceil(Math.pow(registration.lastErrors.length, 2.5)), 'minute').toISOString()
+            console.warn('registration returned an error, progressively backoff', error.error, JSON.stringify(registration))
+          }
         }
+      } else {
+        delete registration.lastErrors
+        registration.lastSuccess = dayjs().toISOString()
       }
     }
     await db.collection('pushSubscriptions').updateOne(ownerFilter, { $set: { registrations: pushSub.registrations } })

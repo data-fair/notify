@@ -36,6 +36,26 @@
                   <span><strong>Id : </strong> {{ registration.id }}</span>
                 </v-list-item-content>
               </v-list-item>
+              <v-list-item v-if="registration.lastSuccess" dense>
+                <v-list-item-content>
+                  <span><strong>Derrnier envoi réussi</strong> {{ registration.lastSuccess | moment('lll') }}</span>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item v-if="registration.disabled === 'gone'" dense>
+                <v-list-item-content>
+                  <span><strong>Désactivé</strong></span>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item v-if="registration.disabled === 'errors'" dense>
+                <v-list-item-content>
+                  <span><strong>Désactivé pour cause d'erreurs en série</strong></span>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item v-if="registration.disabledUntil" dense>
+                <v-list-item-content>
+                  <span><strong>Désactivé temporairement pour cause d'erreur (jusqu'à {{ registration.disabledUntil | moment('lll') }})</strong></span>
+                </v-list-item-content>
+              </v-list-item>
             </v-list>
           </v-card-text>
           <v-divider />
