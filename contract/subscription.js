@@ -42,6 +42,17 @@ module.exports = (locales) => ({
         }]
       }
     },
+    urlTemplate: {
+      type: 'string',
+      title: 'Template de lien'
+    },
+    visibility: {
+      type: 'string',
+      title: 'Visibilité des notifications à recevoir',
+      enum: ['public', 'private'],
+      default: 'private',
+      readOnly: true
+    },
     created: modifier,
     updated: modifier
   }

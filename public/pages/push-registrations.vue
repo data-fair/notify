@@ -1,6 +1,8 @@
 <template>
   <v-container>
-    <register-device @register="refresh" />
+    <v-row class="ma-0">
+      <register-device @register="refresh" />
+    </v-row>
     <edit-dialog :schema="schema" @saved="push" />
     <v-row v-if="registrations">
       <v-col

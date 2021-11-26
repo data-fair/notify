@@ -61,16 +61,24 @@ router.post('', asyncWrap(async (req, res, next) => {
   req.body.updated = { id: req.user.id, name: req.user.name, date: new Date() }
   req.body.created = existingSubscription ? existingSubscription.created : req.body.updated
 
-  if (!req.body.sender && req.user.isAdmin) {
-    // super admin can subscribe to global notifications
-  } else if (req.body.sender.type === req.activeAccount.type && req.body.sender.id === req.activeAccount.id && req.activeAccountRole === 'admin') {
-    // user is admin of sender, ok
-  } else if (req.body.recipient.id === req.user.id && req.body.sender.type === 'user' && req.body.sender.id === req.user.id) {
+  const sender = req.body.sender
+  const recipient = req.body.recipient
+  const user = req.user
+  if (recipient.id !== req.user.id && !user.adminMode) {
+    return res.status(403).send('Impossible de créer un abonnement pour un autre utilisateur')
+  }
+
+  req.body.visibility = req.body.visibility || 'private'
+  if (user.adminMode) {
+    // super admin can do whatever he wants
+  } else if (sender.type === 'user' && sender.id === req.user.id) {
     // user sends to himself, ok
-  } else if (req.body.recipient.id === req.user.id && req.body.sender.type === 'organization' && req.user.organizations.includes(req.body.sender.id)) {
+  } else if (sender.type === 'organization' && !!req.user.organizations.find(o => o.id === req.body.sender.id)) {
     // user subscribes to topic from orga where he is member, ok
   } else {
-    return res.status(403).send()
+    // other cases are accepted, but the subscription will only receive notifications
+    // with public visibility
+    req.body.visibility = 'public'
   }
 
   await db.collection('subscriptions').replaceOne({ _id: req.body._id }, req.body, { upsert: true })
@@ -81,11 +89,8 @@ router.delete('/:id', asyncWrap(async (req, res, next) => {
   const subscription = await req.app.get('db').collection('subscriptions').findOne({ _id: req.params.id })
   if (!subscription) return res.status(204).send()
   // both the sender and the recipient can create/modify a subscription
-  if (subscription.sender && subscription.sender.type === req.activeAccount.type && subscription.sender.id === req.activeAccount.id) {
-    // case where the sender (owner of the topic) creates the subscription
-    if (req.activeAccountRole !== 'admin') return res.status(403).send()
-  } else if (subscription.recipient.id !== req.user.id) {
-    return res.status(403).send()
+  if (!req.user.adminMode && subscription.recipient.id !== req.user.id) {
+    return res.status(403).send('Impossible de supprimer un abonnement pour un autre utilisateur')
   }
 
   await req.app.get('db').collection('subscriptions').deleteOne({ _id: req.params.id })

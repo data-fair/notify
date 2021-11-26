@@ -52,6 +52,7 @@
     "reconnecting-websocket": "^4.2.0",
     "semver-extract": "^1.1.1",
     "shortid": "^2.2.15",
+    "url-template": "^2.0.8",
     "useragent": "^2.3.0",
     "vue-moment": "^4.1.0",
     "vuetify": "^2.6.0",

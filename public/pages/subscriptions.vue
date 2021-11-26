@@ -38,6 +38,16 @@
                   <span><strong>Sorties : </strong> {{ sub.outputs && sub.outputs.join(', ') }}</span>
                 </v-list-item-content>
               </v-list-item>
+              <v-list-item dense>
+                <v-list-item-content>
+                  <span><strong>Visibilité : </strong> {{ sub.visibility }}</span>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item v-if="sub.urlTemplate" dense>
+                <v-list-item-content>
+                  <span><strong>Lien : </strong> {{ sub.urlTemplate }}</span>
+                </v-list-item-content>
+              </v-list-item>
               <v-list-item v-if="sub.locale" dense>
                 <v-list-item-content>
                   <span><strong>Locale : </strong> {{ sub.locale }}</span>

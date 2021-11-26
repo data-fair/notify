@@ -1,5 +1,3 @@
-// this upgrade script is only relevant for Koumoul's environment, no impact for others
-
 exports.description = 'replace "web" output by "devices"'
 
 exports.exec = async (db, debug) => {

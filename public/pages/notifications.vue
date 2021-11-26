@@ -63,10 +63,10 @@ import eventBus from '~/assets/event-bus'
 import EditDialog from '~/components/edit-dialog'
 const schemaBuilder = require('../../contract/notification.js')
 
-const localizeProp = (prop, locale = 'fr') => {
+/* const localizeProp = (prop, locale = 'fr') => {
   if (typeof prop === 'object') return prop[locale] || prop.fr
   return prop
-}
+} */
 
 export default {
   components: { EditDialog },
@@ -96,13 +96,13 @@ export default {
     eventBus.$on(this.channel, notification => {
       this.refresh()
       // eslint-disable-next-line no-new
-      new Notification(localizeProp(notification.title, this.$i18n.locale), { body: localizeProp(notification.body, this.$i18n.locale) })
+      // new Notification(localizeProp(notification.title, this.$i18n.locale), { body: localizeProp(notification.body, this.$i18n.locale) })
     })
-    Notification.requestPermission(function (status) {
+    /* Notification.requestPermission(function (status) {
       if (Notification.permission !== status) {
         Notification.permission = status
       }
-    })
+    }) */
   },
   methods: {
     async refresh () {

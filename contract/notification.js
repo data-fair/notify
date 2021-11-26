@@ -39,6 +39,24 @@ module.exports = (locales, noSingleLocale = false) => {
       topic: topicRef,
       // it will be the recipient of the matched subscription
       recipient,
+      urlParams: {
+        type: 'object',
+        title: 'utilisé pour renseigner subscription.urlTemplate et ainsi créer url',
+        patternProperties: {
+          ".*": { type: 'string' }
+        }
+      },
+      url: {
+        type: 'string',
+        title: 'calculé à partir de subscription.urlTemplate et notification.urlParams',
+        readOnly: true
+      },
+      visibility: {
+        type: 'string',
+        title: 'Visibilité',
+        enum: ['public', 'private'],
+        default: 'private'
+      },
       date: {
         readOnly: true,
         type: 'string',

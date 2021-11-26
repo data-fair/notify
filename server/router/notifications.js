@@ -8,6 +8,7 @@ const validate = ajv.compile(schema)
 const asyncWrap = require('../utils/async-wrap')
 const findUtils = require('../utils/find')
 const auth = require('../utils/auth')
+const urlTemplate = require('url-template')
 const debug = require('debug')('notifications')
 const router = express.Router()
 
@@ -47,6 +48,8 @@ const localize = (notif, locale) => {
 
 // push a notification
 router.post('', asyncWrap(async (req, res, next) => {
+  const db = req.app.get('db')
+
   if (req.query.key) {
     if (req.query.key !== config.secretKeys.notifications) return res.status(401).send()
   } else {
@@ -54,7 +57,13 @@ router.post('', asyncWrap(async (req, res, next) => {
     if (!req.user) return res.status(401).send()
     req.body.sender = req.activeAccount
   }
-  const db = req.app.get('db')
+
+  // maintain compatibility with deprecated "web" output
+  if (req.body.outputs && req.body.outputs.includes('web')) {
+    req.body.outputs = req.body.outputs.filter(o => o !== 'web').concat(['devices'])
+  }
+
+  req.body.visibility = req.body.visibility ?? 'private'
   const valid = validate(req.body)
   if (!valid) return res.status(400).send(validate.errors)
 
@@ -63,6 +72,7 @@ router.post('', asyncWrap(async (req, res, next) => {
   const date = new Date().toISOString()
 
   const filter = { 'topic.key': { $in: topicKeys } }
+  if (req.body.visibility === 'private') filter.visibility = 'private'
   if (req.body.sender) {
     filter['sender.type'] = req.body.sender.type
     filter['sender.id'] = req.body.sender.id
@@ -81,15 +91,19 @@ router.post('', asyncWrap(async (req, res, next) => {
       recipient: subscription.recipient,
       date
     }
+    if (subscription.icon) notification.icon = subscription.icon
+    if (subscription.urlTemplate) notification.url = urlTemplate.parse(subscription.urlTemplate).expand(notification.urlParams || {})
     if (!req.body.topic.title && subscription.topic.title) notification.topic.title = subscription.topic.title
     const localized = localize(notification, subscription.locale)
     await db.collection('notifications').insertOne(notification)
-    if (subscription.outputs.includes('web')) {
-      debug('Send WS notif', subscription.recipient, notification)
-      req.app.get('publishWS')([`user:${subscription.recipient.id}:notifications`], notification)
+    debug('Send WS notif', subscription.recipient, notification)
+    req.app.get('publishWS')([`user:${subscription.recipient.id}:notifications`], notification)
+    if (subscription.outputs.includes('devices')) {
+      debug('Send notif to devices')
       req.app.get('push')(localized).catch(err => console.error('Failed to send push notification', err))
     }
     if (subscription.outputs.includes('email')) {
+      debug('Send notif to email address')
       const mail = {
         to: [{ type: 'user', ...subscription.recipient }],
         subject: localized.title,
