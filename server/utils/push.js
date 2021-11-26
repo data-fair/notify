@@ -137,8 +137,9 @@ router.post('/registrations', asyncWrap(async (req, res) => {
     const errors = await req.app.get('push')({
       recipient: req.user,
       title: `Un nouvel appareil recevra vos notifications`,
-      body: `L'appareil ${registration.deviceName} est confirmé comme destinataire des notifications de l'utilisateur ${req.user.name}.`,
-      date
+      body: `L'appareil ${registration.deviceName} est confirmé comme destinataire de vos notifications.`,
+      date,
+      icon: config.theme.notificationIcon || config.theme.logo || (config.publicUrl + '/logo-192x192.png')
     })
     if (errors.length) return res.status(500).send(errors)
   }

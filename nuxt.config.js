@@ -36,10 +36,10 @@ module.exports = {
     }
   },
   plugins: [
-    { src: '~plugins/iframe-resize', ssr: false },
-    { src: '~plugins/session', ssr: false },
-    { src: '~plugins/ws', ssr: false },
-    { src: '~plugins/moment' },
+    { src: '~plugins/iframe-resize' },
+    { src: '~plugins/session' },
+    { src: '~plugins/ws' },
+    { src: '~plugins/dayjs' },
     { src: '~plugins/localized' }
   ],
   router: {

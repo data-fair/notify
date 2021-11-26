@@ -10,7 +10,7 @@
         :key="i" class="xs" xl="2" lg="3" md="4"
         sm="6"
       >
-        <v-card :elevation="4">
+        <v-card :elevation="4" :disabled="registration.disabled || registration.disabledUntil">
           <template>
             <v-card-title class="title py-2">
               <v-flex text-center pa-0>
@@ -23,7 +23,7 @@
             <v-list>
               <v-list-item dense>
                 <v-list-item-content>
-                  <span><strong>Date : </strong> {{ registration.date | moment('lll') }}</span>
+                  <span><strong>Date : </strong> {{ registration.date | date }}</span>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item dense>
@@ -38,7 +38,7 @@
               </v-list-item>
               <v-list-item v-if="registration.lastSuccess" dense>
                 <v-list-item-content>
-                  <span><strong>Derrnier envoi réussi</strong> {{ registration.lastSuccess | moment('lll') }}</span>
+                  <span><strong>Derrnier envoi réussi</strong> {{ registration.lastSuccess | date }}</span>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item v-if="registration.disabled === 'gone'" dense>
@@ -53,7 +53,7 @@
               </v-list-item>
               <v-list-item v-if="registration.disabledUntil" dense>
                 <v-list-item-content>
-                  <span><strong>Désactivé temporairement pour cause d'erreur (jusqu'à {{ registration.disabledUntil | moment('lll') }})</strong></span>
+                  <span><strong>Désactivé temporairement pour cause d'erreur (jusqu'à {{ registration.disabledUntil | date }})</strong></span>
                 </v-list-item-content>
               </v-list-item>
             </v-list>

@@ -48,6 +48,9 @@ function equalReg (reg1, reg2) {
 }
 
 export default {
+  props: {
+    registrations: { type: Array, default: null }
+  },
   data () {
     return {
       ready: false,
@@ -80,6 +83,8 @@ export default {
           console.log('Local subscription is not matched by remote, unsubscribe')
           await this.subscription.unsubscribe()
           this.subscription = null
+        } else {
+          this.$emit('registration', registration)
         }
       }
       this.ready = true
@@ -111,7 +116,7 @@ export default {
       }
     },
     async getRegistration () {
-      const res = await this.$axios.$get('api/v1/push/registrations')
+      const res = this.registrations || await this.$axios.$get('api/v1/push/registrations')
       return res.find(r => equalReg(r.id, this.subscription))
     },
     async sendBrowserRegistration (id) {

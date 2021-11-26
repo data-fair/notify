@@ -24,7 +24,7 @@
               <v-list>
                 <v-list-item dense>
                   <v-list-item-content>
-                    <span><strong>Date : </strong> {{ notification.date | moment('lll') }}</span>
+                    <span><strong>Date : </strong> {{ notification.date | date }}</span>
                   </v-list-item-content>
                 </v-list-item>
                 <v-list-item dense>
