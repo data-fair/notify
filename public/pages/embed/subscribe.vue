@@ -1,6 +1,6 @@
 <template>
   <v-container fluid data-iframe-height>
-    <v-row v-if="register">
+    <v-row v-if="register && $route.query.register !== 'false'">
       <register-device />
     </v-row>
     <v-row>
