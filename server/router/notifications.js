@@ -87,7 +87,7 @@ router.post('', asyncWrap(async (req, res, next) => {
     const notification = {
       icon: config.theme.notificationIcon || config.theme.logo || (config.publicUrl + '/logo-192x192.png'),
       ...req.body,
-      title: req.body.title || subscription.topic.title || subscription.topic.key,
+      title: req.body.title || req.body.topic.title || subscription.topic.title || subscription.topic.key,
       _id: shortid.generate(),
       recipient: subscription.recipient,
       date
@@ -105,10 +105,17 @@ router.post('', asyncWrap(async (req, res, next) => {
     }
     if (subscription.outputs.includes('email')) {
       debug('Send notif to email address')
+      let text = localized.body || ''
+      let html = `<p>${localized.body || ''}</p>`
+      if (notification.url) {
+        text += '\n\n' + notification.url
+        html += `<p>${req.__({ phrase: 'seeAt', locale: subscription.locale })} <a href="${notification.url}">${new URL(notification.url).host}</a></p>`
+      }
       const mail = {
         to: [{ type: 'user', ...subscription.recipient }],
         subject: localized.title,
-        text: localized.body
+        text,
+        html
       }
       debug('Send mail notif', subscription.recipient, mail, notification)
       axios.post(config.directoryUrl + '/api/mails', mail, { params: { key: config.secretKeys.sendMails } }).catch(err => {

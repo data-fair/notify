@@ -110,6 +110,7 @@ export default {
     },
     async push (notification) {
       if (notification.icon === null) delete notification.icon
+      notification.sender = { type: this.activeAccount.type, id: this.activeAccount.id }
       await this.$axios.$post('api/v1/notifications', notification)
     }
   }

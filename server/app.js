@@ -26,6 +26,8 @@ if (process.env.NODE_ENV === 'development') {
 app.use(cookieParser())
 app.use(bodyParser.json())
 
+app.use(require('./utils/i18n').middleware)
+
 app.get('/api/v1/status', auth(), status.status)
 app.get('/api/v1/ping', status.ping)
 
