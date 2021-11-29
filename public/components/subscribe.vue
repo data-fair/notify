@@ -12,6 +12,7 @@
 
     <template v-if="subscription">
       <v-checkbox
+        v-if="outputs.includes('devices')"
         v-model="subscription.outputs"
         dense
         hide-details
@@ -21,6 +22,7 @@
         @change="sendSubscription(subscription)"
       />
       <v-checkbox
+        v-if="outputs.includes('email')"
         v-model="subscription.outputs"
         dense
         hide-details
@@ -47,7 +49,8 @@ export default {
     topic: { type: Object, default: null },
     noSender: { type: Boolean, default: false },
     icon: { type: String, default: null },
-    urlTemplate: { type: String, default: null }
+    urlTemplate: { type: String, default: null },
+    outputs: { type: Array, default: () => ['email', 'devices'] }
   },
   data: () => ({
     subscription: null,

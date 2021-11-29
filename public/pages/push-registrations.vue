@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row class="ma-0">
-      <register-device @register="refresh" />
+      <register-device v-if="registrations" :registrations="registrations" @register="refresh" />
     </v-row>
     <edit-dialog :schema="schema" @saved="push" />
     <v-row v-if="registrations">

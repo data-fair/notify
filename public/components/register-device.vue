@@ -1,7 +1,8 @@
 <template>
   <v-alert
     v-if="ready && (!subscription || err)"
-    :type="err ? 'error' : 'accent'"
+    :color="err ? 'error' : 'accent'"
+    dark
     dense
     class="ma-1"
     :class="{'py-0 pr-0' : !err}"
@@ -49,7 +50,7 @@ function equalReg (reg1, reg2) {
 
 export default {
   props: {
-    registrations: { type: Array, default: null }
+    registrations: { type: Array, required: true }
   },
   data () {
     return {
@@ -116,7 +117,7 @@ export default {
       }
     },
     async getRegistration () {
-      const res = this.registrations || await this.$axios.$get('api/v1/push/registrations')
+      const res = this.registrations
       return res.find(r => equalReg(r.id, this.subscription))
     },
     async sendBrowserRegistration (id) {

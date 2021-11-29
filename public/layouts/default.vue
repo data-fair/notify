@@ -21,7 +21,7 @@
             </v-tab>
             <v-tab :to="localePath({name:'push-registrations'})">
               Appareils
-              <v-icon>mdi-cellphone-android</v-icon>
+              <v-icon>mdi-devices</v-icon>
             </v-tab>
           </v-tabs>
         </v-flex>
