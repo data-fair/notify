@@ -87,6 +87,7 @@ router.post('', asyncWrap(async (req, res, next) => {
     const notification = {
       icon: config.theme.notificationIcon || config.theme.logo || (config.publicUrl + '/logo-192x192.png'),
       ...req.body,
+      title: req.body.title || subscription.topic.title || subscription.topic.key,
       _id: shortid.generate(),
       recipient: subscription.recipient,
       date
