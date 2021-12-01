@@ -12,5 +12,8 @@ export default async ({ store, app, env, $vuetify, route }) => {
     cookies: app.$cookies,
     directoryUrl: env.directoryUrl
   })
-  store.dispatch('session/loop', app.$cookies)
+  // no need to maintain keepalive / readcookie loops in every embedded view
+  if (!route.path.startsWith('/embed/')) {
+    store.dispatch('session/loop', app.$cookies)
+  }
 }
