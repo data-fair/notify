@@ -18,6 +18,7 @@
         :icon="$route.query.icon"
         :url-template="$route.query['url-template']"
         :outputs="outputs"
+        :sender="sender"
         @register="register = true"
       />
     </v-row>
@@ -45,6 +46,11 @@ export default {
       const keys = this.$route.query.key.split(',')
       const titles = this.$route.query.title.split(',')
       return keys.map((key, i) => ({ key, title: titles[i] }))
+    },
+    sender () {
+      if (!this.$route.query.sender) return null
+      const [type, id] = this.$route.query.sender.split(':')
+      return { type, id }
     }
   },
   mounted () {

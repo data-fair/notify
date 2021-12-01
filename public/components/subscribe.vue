@@ -50,7 +50,8 @@ export default {
     noSender: { type: Boolean, default: false },
     icon: { type: String, default: null },
     urlTemplate: { type: String, default: null },
-    outputs: { type: Array, default: () => ['email', 'devices'] }
+    outputs: { type: Array, default: () => ['email', 'devices'] },
+    sender: { type: Object, default: null }
   },
   data: () => ({
     subscription: null,
@@ -72,6 +73,9 @@ export default {
       }
       if (this.noSender) {
         params.noSender = 'true'
+      } if (this.sender) {
+        params.senderType = this.sender.type
+        params.senderId = this.sender.id
       } else {
         params.senderType = this.activeAccount.type
         params.senderId = this.activeAccount.id
@@ -95,7 +99,7 @@ export default {
           outputs: [],
           locale: this.$i18n.locale
         }
-        if (!this.noSender) subscription.sender = this.activeAccount
+        if (!this.noSender) subscription.sender = this.sender || this.activeAccount
         if (this.icon) subscription.icon = this.icon
         if (this.urlTemplate) subscription.urlTemplate = this.urlTemplate
         await this.sendSubscription(subscription)
