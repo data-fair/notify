@@ -77,11 +77,11 @@ const sendNotification = async (req, notification) => {
   await req.app.get('db').collection('notifications').insertOne(notification)
   debug('Send WS notif', notification.recipient, notification)
   req.app.get('publishWS')([`user:${notification.recipient.id}:notifications`], notification)
-  if (notification.outputs.includes('devices')) {
+  if (notification.outputs && notification.outputs.includes('devices')) {
     debug('Send notif to devices')
     req.app.get('push')(notification).catch(err => console.error('Failed to send push notification', err))
   }
-  if (notification.outputs.includes('email')) {
+  if (notification.outputs && notification.outputs.includes('email')) {
     debug('Send notif to email address')
     let text = notification.body || ''
     let html = `<p>${notification.body || ''}</p>`
