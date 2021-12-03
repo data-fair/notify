@@ -30,6 +30,11 @@ module.exports = (locales, noSingleLocale = false) => {
           title: 'Contenu'
         }, i18nMsg('Contenu')]
       },
+      locale: {
+        type: 'string',
+        title: 'Langue de la notification',
+        enum: locales
+      },
       icon: {
         type: 'string',
         title: `URL de l'icone de la notification`
@@ -39,6 +44,20 @@ module.exports = (locales, noSingleLocale = false) => {
       topic: topicRef,
       // it will be the recipient of the matched subscription
       recipient,
+      outputs: {
+        type: 'array',
+        title: 'Sorties',
+        items: {
+          type: 'string',
+          oneOf: [{
+            const: 'devices',
+            title: 'recevoir la notification sur vos appareils configurés'
+          }, {
+            const: 'email',
+            title: 'recevoir la notification par email'
+          }]
+        }
+      },
       urlParams: {
         type: 'object',
         title: 'utilisé pour renseigner subscription.urlTemplate et ainsi créer url',

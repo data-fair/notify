@@ -38,93 +38,115 @@ router.get('', auth(), asyncWrap(async (req, res, next) => {
   res.json({ results, count, countNew })
 }))
 
-const localizeProp = (prop, locale = 'fr') => {
-  if (typeof prop === 'object') return prop[locale] || prop.fr
+const localizeProp = (prop, locale) => {
+  if (prop && typeof prop === 'object') return prop[locale || config.i18n.defaultLocale] || prop[config.i18n.defaultLocale]
   return prop
 }
-const localize = (notif, locale) => {
-  return { ...notif, title: localizeProp(notif.title, locale), body: localizeProp(notif.body, locale) }
+const localize = (notif) => {
+  return { ...notif, title: localizeProp(notif.title, notif.locale), body: localizeProp(notif.body, notif.locale) }
+}
+
+const prepareNotifSubscription = (originalNotification, subscription) => {
+  const notification = {
+    icon: subscription.icon || config.theme.notificationIcon || config.theme.logo || (config.publicUrl + '/logo-192x192.png'),
+    locale: subscription.locale,
+    ...originalNotification, // this is after setting icon/locale, so it takes precedence
+    _id: shortid.generate(),
+    recipient: subscription.recipient
+  }
+  if (subscription.outputs && (!notification.outputs || !notification.outputs.length)) {
+    notification.outputs = subscription.outputs
+  }
+  if (subscription.urlTemplate) {
+    notification.url = urlTemplate.parse(subscription.urlTemplate).expand(notification.urlParams || {})
+  }
+  if (!notification.topic.title && subscription.topic.title) {
+    notification.topic.title = subscription.topic.title
+  }
+  // maintain compatibility with deprecated "web" output
+  if (notification.outputs && notification.outputs.includes('web')) {
+    notification.outputs = notification.outputs.filter(o => o !== 'web').concat(['devices'])
+  }
+  return notification
+}
+
+const sendNotification = async (req, notification) => {
+  if (!notification.locale) notification.locale = config.i18n.defaultLocale
+  if (!notification.title) notification.title = notification.topic.title || notification.topic.key
+  notification = localize(notification)
+  await req.app.get('db').collection('notifications').insertOne(notification)
+  debug('Send WS notif', notification.recipient, notification)
+  req.app.get('publishWS')([`user:${notification.recipient.id}:notifications`], notification)
+  if (notification.outputs.includes('devices')) {
+    debug('Send notif to devices')
+    req.app.get('push')(notification).catch(err => console.error('Failed to send push notification', err))
+  }
+  if (notification.outputs.includes('email')) {
+    debug('Send notif to email address')
+    let text = notification.body || ''
+    let html = `<p>${notification.body || ''}</p>`
+    if (notification.url) {
+      text += '\n\n' + notification.url
+      html += `<p>${req.__({ phrase: 'seeAt', locale: notification.locale })} <a href="${notification.url}">${new URL(notification.url).host}</a></p>`
+    }
+    const mail = {
+      to: [{ type: 'user', ...notification.recipient }],
+      subject: notification.title,
+      text,
+      html
+    }
+    debug('Send mail notif', notification.recipient, mail, notification)
+    axios.post(config.directoryUrl + '/api/mails', mail, { params: { key: config.secretKeys.sendMails } }).catch(err => {
+      console.error('Failed to send mail', err)
+    })
+  }
 }
 
 // push a notification
 router.post('', asyncWrap(async (req, res, next) => {
   const db = req.app.get('db')
+  const notification = req.body
 
   if (req.query.key) {
     if (req.query.key !== config.secretKeys.notifications) return res.status(401).send()
   } else {
     await auth(false)(req, res, () => {})
     if (!req.user) return res.status(401).send()
-    req.body.sender = req.activeAccount
+    notification.sender = req.activeAccount
   }
 
-  // maintain compatibility with deprecated "web" output
-  if (req.body.outputs && req.body.outputs.includes('web')) {
-    req.body.outputs = req.body.outputs.filter(o => o !== 'web').concat(['devices'])
-  }
-
-  req.body.visibility = req.body.visibility ?? 'private'
-  const valid = validate(req.body)
+  notification.visibility = notification.visibility ?? 'private'
+  notification.date = new Date().toISOString()
+  const valid = validate(notification)
   if (!valid) return res.status(400).send(validate.errors)
 
-  const topicParts = req.body.topic.key.split(':')
+  // prepare the filter to find the topics matching this subscription
+  const topicParts = notification.topic.key.split(':')
   const topicKeys = topicParts.map((part, i) => topicParts.slice(0, i + 1).join(':'))
-  const date = new Date().toISOString()
-
   const filter = { 'topic.key': { $in: topicKeys } }
-  if (req.body.visibility === 'private') filter.visibility = 'private'
-  if (req.body.sender) {
-    filter['sender.type'] = req.body.sender.type
-    filter['sender.id'] = req.body.sender.id
+  if (notification.visibility === 'private') filter.visibility = 'private'
+  if (notification.sender) {
+    filter['sender.type'] = notification.sender.type
+    filter['sender.id'] = notification.sender.id
   } else {
     filter.sender = { $exists: false }
   }
-  const subscriptionsCursor = db.collection('subscriptions')
-    .find(filter)
-
-  while (await subscriptionsCursor.hasNext()) {
-    const subscription = await subscriptionsCursor.next()
-    const notification = {
-      icon: config.theme.notificationIcon || config.theme.logo || (config.publicUrl + '/logo-192x192.png'),
-      ...req.body,
-      title: req.body.title || req.body.topic.title || subscription.topic.title || subscription.topic.key,
-      _id: shortid.generate(),
-      recipient: subscription.recipient,
-      date
-    }
-    if (subscription.icon) notification.icon = subscription.icon
-    if (subscription.urlTemplate) notification.url = urlTemplate.parse(subscription.urlTemplate).expand(notification.urlParams || {})
-    if (!req.body.topic.title && subscription.topic.title) notification.topic.title = subscription.topic.title
-    const localized = localize(notification, subscription.locale)
-    await db.collection('notifications').insertOne(notification)
-    debug('Send WS notif', subscription.recipient, notification)
-    req.app.get('publishWS')([`user:${subscription.recipient.id}:notifications`], notification)
-    if (subscription.outputs.includes('devices')) {
-      debug('Send notif to devices')
-      req.app.get('push')(localized).catch(err => console.error('Failed to send push notification', err))
-    }
-    if (subscription.outputs.includes('email')) {
-      debug('Send notif to email address')
-      let text = localized.body || ''
-      let html = `<p>${localized.body || ''}</p>`
-      if (notification.url) {
-        text += '\n\n' + notification.url
-        html += `<p>${req.__({ phrase: 'seeAt', locale: subscription.locale })} <a href="${notification.url}">${new URL(notification.url).host}</a></p>`
-      }
-      const mail = {
-        to: [{ type: 'user', ...subscription.recipient }],
-        subject: localized.title,
-        text,
-        html
-      }
-      debug('Send mail notif', subscription.recipient, mail, notification)
-      axios.post(config.directoryUrl + '/api/mails', mail, { params: { key: config.secretKeys.sendMails } }).catch(err => {
-        console.error('Failed to send mail', err)
-      })
-    }
+  if (notification.recipient) {
+    filter['recipient.id'] = notification.recipient.id
+  }
+  let nbSent = 0
+  for await (const subscription of db.collection('subscriptions').find(filter)) {
+    await sendNotification(req, prepareNotifSubscription(notification, subscription))
+    nbSent += 1
   }
 
-  res.status(200).json(req.body)
+  // if the notification was directly targetted to the user, no need for a subscription
+  // the subscription might still have been used to customize locale, outputs, etc.. but it is not required
+  if (notification.recipient && !nbSent) {
+    await sendNotification(req, notification)
+  }
+
+  res.status(200).json(notification)
 }))
 
 module.exports = router
