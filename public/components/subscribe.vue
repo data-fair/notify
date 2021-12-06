@@ -73,7 +73,7 @@ export default {
       }
       if (this.noSender) {
         params.noSender = 'true'
-      } if (this.sender) {
+      } else if (this.sender) {
         params.senderType = this.sender.type
         params.senderId = this.sender.id
       } else {
