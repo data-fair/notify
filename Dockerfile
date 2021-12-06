@@ -1,6 +1,8 @@
 FROM node:16.13.0-alpine3.13
 MAINTAINER "contact@koumoul.com"
 
+RUN apk add --no-cache --update curl
+
 ENV NODE_ENV production
 WORKDIR /webapp
 
