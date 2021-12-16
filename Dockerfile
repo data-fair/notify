@@ -23,7 +23,7 @@ RUN npm run build
 # Adding server files
 ADD server server
 ADD upgrade upgrade
-ADD README.md VERSION.json* .
+ADD README.md BUILD.json* ./
 
 ADD README.md .
 

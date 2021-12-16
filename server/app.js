@@ -37,6 +37,16 @@ app.use('/api/v1/notifications', require('./router/notifications'))
 app.use('/api/v1/push', auth(), require('./utils/push').router)
 app.use('/api/v1/identities', require('./router/identities'))
 
+let info = { version: process.env.NODE_ENV }
+try { info = require('../BUILD.json') } catch (err) {}
+app.get('/api/v1/info', auth(true), (req, res) => {
+  res.send(info)
+})
+app.get('/api/v1/admin/info', auth(true), (req, res) => {
+  if (!req.user.adminMode) return res.status(403).send()
+  res.send({ ...info, config })
+})
+
 // Run app and return it in a promise
 let wss
 exports.start = async () => {
