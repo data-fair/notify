@@ -113,6 +113,9 @@ router.post('', asyncWrap(async (req, res, next) => {
     await auth(false)(req, res, () => {})
     if (!req.user) return res.status(401).send()
     notification.sender = req.activeAccount
+    if (!req.user.adminMode && (!notification.recipient || notification.recipient.id !== req.user.id)) {
+      return res.status(403).send()
+    }
   }
 
   notification.visibility = notification.visibility ?? 'private'
