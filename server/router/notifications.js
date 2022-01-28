@@ -43,7 +43,7 @@ const localizeProp = (prop, locale) => {
   return prop
 }
 const localize = (notif) => {
-  return { ...notif, title: localizeProp(notif.title, notif.locale), body: localizeProp(notif.body, notif.locale) }
+  return { ...notif, title: localizeProp(notif.title, notif.locale), body: localizeProp(notif.body, notif.locale), htmlBody: localizeProp(notif.htmlBody, notif.locale) }
 }
 
 const prepareNotifSubscription = (originalNotification, subscription) => {
@@ -84,16 +84,16 @@ const sendNotification = async (req, notification) => {
   if (notification.outputs && notification.outputs.includes('email')) {
     debug('Send notif to email address')
     let text = notification.body || ''
-    let html = `<p>${notification.body || ''}</p>`
+    let simpleHtml = `<p>${notification.body || ''}</p>`
     if (notification.url) {
       text += '\n\n' + notification.url
-      html += `<p>${req.__({ phrase: 'seeAt', locale: notification.locale })} <a href="${notification.url}">${new URL(notification.url).host}</a></p>`
+      simpleHtml += `<p>${req.__({ phrase: 'seeAt', locale: notification.locale })} <a href="${notification.url}">${new URL(notification.url).host}</a></p>`
     }
     const mail = {
       to: [{ type: 'user', ...notification.recipient }],
       subject: notification.title,
       text,
-      html
+      html: notification.htmlBody || simpleHtml
     }
     debug('Send mail notif', notification.recipient, mail, notification)
     axios.post(config.directoryUrl + '/api/mails', mail, { params: { key: config.secretKeys.sendMails } }).catch(err => {
