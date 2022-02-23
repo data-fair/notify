@@ -1,27 +1,32 @@
 <template>
   <v-container fluid data-iframe-height>
-    <v-row v-if="register && $route.query.register !== 'false' && registrations && !loading">
-      <register-device :registrations="registrations" @register="refresh" />
-    </v-row>
-    <v-row>
-      <v-col>
-        <v-subheader class="px-0" style="height: auto;">
-          {{ $tc('notifyMe', topics.length) }}
-        </v-subheader>
-      </v-col>
-    </v-row>
-    <v-row v-for="topic in topics" :key="topic.key" class="ma-0">
-      <subscribe
-        v-if="outputs"
-        :topic="topic"
-        :no-sender="!!$route.query.noSender"
-        :icon="$route.query.icon"
-        :url-template="$route.query['url-template']"
-        :outputs="outputs"
-        :sender="sender"
-        @register="register = true"
-      />
-    </v-row>
+    <v-alert v-if="!user" type="error" style="display:inline-block;">
+      Vous devez être connecté pour pouvoir recevoir des notifications.
+    </v-alert>
+    <template v-else>
+      <v-row v-if="register && $route.query.register !== 'false' && registrations && !loading">
+        <register-device :registrations="registrations" @register="refresh" />
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-subheader class="px-0" style="height: auto;">
+            {{ $tc('notifyMe', topics.length) }}
+          </v-subheader>
+        </v-col>
+      </v-row>
+      <v-row v-for="topic in topics" :key="topic.key" class="ma-0">
+        <subscribe
+          v-if="outputs"
+          :topic="topic"
+          :no-sender="!!$route.query.noSender"
+          :icon="$route.query.icon"
+          :url-template="$route.query['url-template']"
+          :outputs="outputs"
+          :sender="sender"
+          @register="register = true"
+        />
+      </v-row>
+    </template>
   </v-container>
 </template>
 
@@ -31,6 +36,7 @@ fr:
 </i18n>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   layout: 'embed',
   data () {
@@ -42,6 +48,7 @@ export default {
     }
   },
   computed: {
+    ...mapState('session', ['user']),
     topics () {
       const keys = this.$route.query.key.split(',')
       const titles = this.$route.query.title.split(',')

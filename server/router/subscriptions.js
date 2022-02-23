@@ -71,9 +71,9 @@ router.post('', asyncWrap(async (req, res, next) => {
   req.body.visibility = req.body.visibility || 'private'
   if (user.adminMode) {
     // super admin can do whatever he wants
-  } else if (sender.type === 'user' && sender.id === req.user.id) {
+  } else if (sender && sender.type === 'user' && sender.id === req.user.id) {
     // user sends to himself, ok
-  } else if (sender.type === 'organization' && !!req.user.organizations.find(o => o.id === req.body.sender.id)) {
+  } else if (sender && sender.type === 'organization' && !!req.user.organizations.find(o => o.id === req.body.sender.id)) {
     // user subscribes to topic from orga where he is member, ok
   } else {
     // other cases are accepted, but the subscription will only receive notifications
