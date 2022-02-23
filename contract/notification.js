@@ -30,6 +30,12 @@ module.exports = (locales, noSingleLocale = false) => {
           title: 'Contenu'
         }, i18nMsg('Contenu')]
       },
+      htmlBody: noSingleLocale ? i18nMsg('Contenu HTML') : {
+        oneOf: [{
+          type: 'string',
+          title: 'Contenu HTML'
+        }, i18nMsg('Contenu HTML')]
+      },
       locale: {
         type: 'string',
         title: 'Langue de la notification',
@@ -67,7 +73,7 @@ module.exports = (locales, noSingleLocale = false) => {
       },
       url: {
         type: 'string',
-        title: 'calculé à partir de subscription.urlTemplate et notification.urlParams',
+        title: 'peut être calculé à partir de subscription.urlTemplate et notification.urlParams',
         readOnly: true
       },
       visibility: {
