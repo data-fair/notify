@@ -1,0 +1,26 @@
+<template>
+  <div class="container">
+    <v-row justify="center" class="my-1">
+      <v-alert
+        type="error"
+        style="display:inline-block"
+        outlined
+        border="left"
+      >
+        {{ (error.response && error.response.data) || error.message || error }}
+      </v-alert>
+    </v-row>
+  </div>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+
+export default {
+  props: ['error'],
+  layout: 'embed',
+  computed: {
+    ...mapState('session', ['user'])
+  }
+}
+</script>

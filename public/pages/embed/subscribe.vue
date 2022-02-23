@@ -1,6 +1,6 @@
 <template>
   <v-container fluid data-iframe-height>
-    <v-alert v-if="!user" type="error" style="display:inline-block;">
+    <v-alert v-if="!user" type="error" style="display:inline-block;" class="my-1">
       Vous devez être connecté pour pouvoir recevoir des notifications.
     </v-alert>
     <template v-else>
