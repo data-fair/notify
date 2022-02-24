@@ -5,3 +5,5 @@ nuxt-dist
 security
 config/local-*
 dist
+.idea
+.vscode
