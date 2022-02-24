@@ -11,6 +11,7 @@ Vue.prototype.$dayjs = dayjs
 
 Vue.filter('date', (value, format = 'LLL') => {
   if (!value) return
+  if (format === 'fromNow') return dayjs(value).fromNow()
   return dayjs(value).format(format)
 })
 

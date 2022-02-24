@@ -1,7 +1,9 @@
 <template>
   <v-container fluid data-iframe-height>
-    <div class="title mb-4">
-      {{ $tc('notifications', notifications ? notifications.count : 0, {nb: notifications ? notifications.count : 0}) }}
+    <div class="title mb-5">
+      <v-icon class="mt-n1 mr-1">
+        mdi-bell
+      </v-icon><span>{{ $tc('notifications', notifications ? notifications.count : 0, {nb: notifications ? notifications.count : 0}) }}</span>
     </div>
     <v-row v-if="notifications">
       <v-col
@@ -13,9 +15,9 @@
         >
           <v-card
             :elevation="hover ? 2 : 0"
-            height="85" rounded :href="notification && notification.url" target="_blank" outlined
+            height="100%" rounded :href="notification && notification.url" target="_blank" outlined
           >
-            <v-card-text class="d-flex justify-space-between">
+            <v-card-text class="d-flex justify-space-between pt-1 pb-1">
               <div class="d-flex align-center">
                 <v-avatar size="40" class="mr-3 mt-1">
                   <img
@@ -37,13 +39,18 @@
                 </div>
               </div>
               <div class="d-flex align-center justify-center">
-                {{ notification.date | date }}
+                {{ notification.date | date('fromNow') }}
               </div>
             </v-card-text>
           </v-card>
         </v-hover>
       </v-col>
     </v-row>
+    <div class="mt-3">
+      <v-btn block @click="page++; refresh()">
+        Voir plus
+      </v-btn>
+    </div>
     <!--    <pre style="font-size: 10px;">{{ notifications }}</pre>-->
   </v-container>
 </template>
@@ -63,6 +70,8 @@ export default {
   layout: 'embed',
   data: () => ({
     eventBus,
+    page: 0,
+    size: 10,
     notifications: null
   }),
   computed: {
@@ -76,12 +85,17 @@ export default {
     await this.refresh()
     eventBus.$emit('subscribe', this.channel)
     eventBus.$on(this.channel, notification => {
-      this.refresh()
+      this.refresh(true)
     })
   },
   methods: {
-    async refresh () {
-      this.notifications = await this.$axios.$get('api/v1/notifications')
+    async refresh (clean) {
+      const tmp = await this.$axios.$get('api/v1/notifications', { params: { skip: this.page * this.size, size: this.size } })
+      if (!clean && this.notifications && this.notifications.results && this.notifications.results.length) {
+        this.notifications.results = this.notifications.results.concat(tmp.results)
+      } else {
+        this.notifications = tmp
+      }
     }
   }
 }
