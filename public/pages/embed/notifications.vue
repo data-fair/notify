@@ -39,16 +39,21 @@
                 </div>
               </div>
               <div class="d-flex align-center justify-end" style="flex-shrink: 0;">
-                {{ notification.date | date('fromNow') }}
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <span v-on="on">{{ notification.date | date('fromNow') }}</span>
+                  </template>
+                  <span>{{ notification.date | date('LLLL') }}</span>
+                </v-tooltip>
               </div>
             </v-card-text>
           </v-card>
         </v-hover>
       </v-col>
     </v-row>
-    <div class="mt-3">
+    <div v-if="notifications && notifications.count && !(((notifications.results && notifications.results.length) || 0) >= (notifications.count || 0))" class="mt-3">
       <v-btn block @click="page++; refresh()">
-        Voir plus
+        {{ $tc('seeMore') }}
       </v-btn>
     </div>
     <!--    <pre style="font-size: 10px;">{{ notifications }}</pre>-->
@@ -58,8 +63,10 @@
 <i18n lang="yaml">
 fr:
   notifications: "Aucune notification | {nb} notifications"
+  seeMore: "Voir plus"
 en:
   notifications: "No notification | {nb} notifications"
+  seeMore: "See more"
 </i18n>
 
 <script>
