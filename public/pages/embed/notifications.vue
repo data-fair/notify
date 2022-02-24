@@ -31,14 +31,14 @@
                 </v-avatar>
                 <div class="d-flex align-center flex-column">
                   <div class="black--text subtitle-1" style="align-self: start;">
-                    {{ notification.title }}
+                    {{ typeof notification.title === 'object' ? notification.title[$i18n.locale] || notification.title['en'] || notification.title['fr'] : notification.title }}
                   </div>
                   <div v-if="notification.body && notification.body.length" style="align-self: start;">
                     {{ notification.body }}
                   </div>
                 </div>
               </div>
-              <div class="d-flex align-center justify-center">
+              <div class="d-flex align-center justify-end" style="flex-shrink: 0;">
                 {{ notification.date | date('fromNow') }}
               </div>
             </v-card-text>
