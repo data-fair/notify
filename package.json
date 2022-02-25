@@ -10,6 +10,9 @@
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "test": "NODE_ENV=test mocha --exit --timeout 10000"
   },
+  "engines": {
+    "node": "v16"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/koumoul-dev/notify.git"
