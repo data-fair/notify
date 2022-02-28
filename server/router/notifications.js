@@ -12,6 +12,8 @@ const urlTemplate = require('url-template')
 const debug = require('debug')('notifications')
 const router = express.Router()
 
+const DIRECTORY_URL = config.privateDirectoryUrl || config.directoryUrl
+
 // Get the list of notifications
 router.get('', auth(), asyncWrap(async (req, res, next) => {
   const db = req.app.get('db')
@@ -96,7 +98,7 @@ const sendNotification = async (req, notification) => {
       html: notification.htmlBody || simpleHtml
     }
     debug('Send mail notif', notification.recipient, mail, notification)
-    axios.post(config.directoryUrl + '/api/mails', mail, { params: { key: config.secretKeys.sendMails } }).catch(err => {
+    axios.post(DIRECTORY_URL + '/api/mails', mail, { params: { key: config.secretKeys.sendMails } }).catch(err => {
       console.error('Failed to send mail', err)
     })
   }
