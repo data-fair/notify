@@ -7,7 +7,8 @@
     "dev-server": "NODE_ENV=development nodemon server",
     "dev-client": "NODE_ENV=development nuxt",
     "build": "nuxt build",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "lint": "eslint --ext js,vue --ignore-path .gitignore .",
+    "lint-fix": "eslint --fix --ext js,vue --ignore-path .gitignore .",
     "test": "NODE_ENV=test mocha --exit --timeout 10000"
   },
   "engines": {
@@ -24,18 +25,60 @@
   ],
   "author": "Alban Mouton <alban.mouton@gmail.com>",
   "license": "AGPL-3.0-only",
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "plugins": [
+      "no-only-tests"
+    ],
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended",
+      "standard",
+      "plugin:vue/recommended"
+    ],
+    "rules": {
+      "vue/no-v-html": "off",
+      "vue/multi-word-component-names": "off",
+      "node/no-deprecated-api": "off",
+      "vue/no-mutating-props": "off",
+      "vue/require-prop-types": "off",
+      "vue/no-useless-template-attributes": "off"
+    }
+  },
   "bugs": {
     "url": "https://github.com/koumoul-dev/notify/issues"
   },
   "homepage": "https://github.com/koumoul-dev/notify#readme",
+  "devDependencies": {
+    "@koumoul/sd-vue": "1.2.2",
+    "@koumoul/vjsf": "^2.0.3",
+    "@mdi/font": "^6.6.95",
+    "@nuxtjs/vuetify": "^1.12.1",
+    "babel-eslint": "^10.0.3",
+    "clean-modules": "^2.0.4",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-no-only-tests": "^2.6.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.1",
+    "eslint-plugin-vue": "^8.5.0",
+    "http-proxy-middleware": "^0.20.0",
+    "iframe-resizer": "^4.2.3",
+    "mocha": "^6.2.2",
+    "nuxt": "^2.15.8",
+    "reconnecting-websocket": "^4.2.0",
+    "vue-moment": "^4.1.0",
+    "vuetify": "^2.6.0"
+  },
   "dependencies": {
     "@koumoul/nuxt-config-inject": "^0.4.2",
     "@koumoul/sd-express": "1.1.2",
-    "@koumoul/sd-vue": "1.2.2",
-    "@koumoul/vjsf": "^2.0.3",
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/i18n": "^7.2.0",
-    "@nuxtjs/vuetify": "^1.12.1",
     "accept-language-parser": "^1.5.0",
     "ajv": "^6.10.2",
     "body-parser": "^1.19.0",
@@ -47,33 +90,15 @@
     "express": "^4.17.1",
     "flat": "^5.0.2",
     "i18n": "^0.13.3",
-    "iframe-resizer": "^4.2.3",
     "js-cookie": "^3.0.1",
     "moment": "^2.24.0",
     "mongodb": "^4.2.0",
     "node-pushnotifications": "^1.2.0",
     "nodemon": "^1.19.4",
-    "nuxt": "^2.15.8",
-    "reconnecting-websocket": "^4.2.0",
     "semver-extract": "^1.1.1",
     "shortid": "^2.2.15",
     "url-template": "^2.0.8",
     "useragent": "^2.3.0",
-    "vue-moment": "^4.1.0",
-    "vuetify": "^2.6.0",
     "ws": "^7.2.0"
-  },
-  "devDependencies": {
-    "babel-eslint": "^10.0.3",
-    "eslint": "^6.6.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "eslint-plugin-vue": "^6.0.0",
-    "eslint-plugin-vuetify": "^1.0.0-beta.5",
-    "http-proxy-middleware": "^0.20.0",
-    "mocha": "^6.2.2"
   }
 }

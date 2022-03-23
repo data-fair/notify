@@ -1,14 +1,32 @@
 <template>
-  <v-container fluid data-iframe-height>
-    <v-row v-if="!loading && registrations" class="ma-0">
-      <register-device :registrations="registrations" @register="refresh" @registration="r => localRegistration = r" />
+  <v-container
+    fluid
+    data-iframe-height
+  >
+    <v-row
+      v-if="!loading && registrations"
+      class="ma-0"
+    >
+      <register-device
+        :registrations="registrations"
+        @register="refresh"
+        @registration="r => localRegistration = r"
+      />
     </v-row>
     <v-row v-if="registrations">
       <v-col
-        v-for="(registration, i) of registrations" :key="i" cols="12" md="6" lg="4"
+        v-for="(registration, i) of registrations"
+        :key="i"
+        cols="12"
+        md="6"
+        lg="4"
         xl="3"
       >
-        <device-card :registration="registration" :is-local="localRegistration === registration" @delete="remove(i)" />
+        <device-card
+          :registration="registration"
+          :is-local="localRegistration === registration"
+          @delete="remove(i)"
+        />
       </v-col>
     </v-row>
   </v-container>

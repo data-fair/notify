@@ -12,7 +12,11 @@
     </template>
     <template v-else>
       {{ $t('registerDevice') }}
-      <v-btn text class="ml-1" @click="register">
+      <v-btn
+        text
+        class="ml-1"
+        @click="register"
+      >
         {{ $t('ok') }}
       </v-btn>
     </template>
@@ -109,10 +113,10 @@ export default {
         if (Notification.permission === 'denied') {
           this.ready = false
           console.log('The user has blocked permissions')
-          this.err = `Les notifications sont bloquées sur cet appareil pour cette application.`
+          this.err = 'Les notifications sont bloquées sur cet appareil pour cette application.'
         } else {
           console.error('Error while subscribing', err)
-          this.err = `Échec lors de l'envoi d'une notification à cet appareil.`
+          this.err = 'Échec lors de l\'envoi d\'une notification à cet appareil.'
         }
       }
     },

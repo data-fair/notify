@@ -1,6 +1,9 @@
 <template>
   <v-container>
-    <edit-dialog :schema="schema" @saved="push" />
+    <edit-dialog
+      :schema="schema"
+      @saved="push"
+    />
     <template v-if="notifications && notifications.results.length">
       <v-row class="ma-0">
         {{ notifications.count }} notifications dont {{ notifications.countNew }} nouvelles
@@ -8,18 +11,26 @@
       <v-row>
         <v-col
           v-for="notification in notifications.results"
-          :key="notification._id" class="xs" xl="2" lg="3" md="4"
+          :key="notification._id"
+          class="xs"
+          xl="2"
+          lg="3"
+          md="4"
           sm="6"
         >
-          <v-card :elevation="4" :dark="notification.new">
-            <template>
-              <v-card-title class="title py-2">
-                <v-flex text-center pa-0>
-                  {{ notification.title | localized($i18n.locale) }}
-                </v-flex>
-              </v-card-title>
-              <v-divider />
-            </template>
+          <v-card
+            :elevation="4"
+            :dark="notification.new"
+          >
+            <v-card-title class="title py-2">
+              <v-flex
+                text-center
+                pa-0
+              >
+                {{ notification.title | localized($i18n.locale) }}
+              </v-flex>
+            </v-card-title>
+            <v-divider />
             <v-card-text class="px-0 pt-0">
               <v-list>
                 <v-list-item dense>

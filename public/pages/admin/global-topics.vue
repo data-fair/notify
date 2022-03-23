@@ -1,21 +1,29 @@
 <template>
   <v-container>
-    <edit-dialog :schema="schema" @saved="save" />
+    <edit-dialog
+      :schema="schema"
+      @saved="save"
+    />
     <v-row>
       <v-col
         v-for="topic in topics"
-        :key="topic._id" class="xs" xl="2" lg="3" md="4"
+        :key="topic._id"
+        class="xs"
+        xl="2"
+        lg="3"
+        md="4"
         sm="6"
       >
         <v-card :elevation="4">
-          <template>
-            <v-card-title class="title py-2">
-              <v-flex text-center pa-0>
-                {{ topic.title }}
-              </v-flex>
-            </v-card-title>
-            <v-divider />
-          </template>
+          <v-card-title class="title py-2">
+            <v-flex
+              text-center
+              pa-0
+            >
+              {{ topic.title }}
+            </v-flex>
+          </v-card-title>
+          <v-divider />
           <v-card-text class="px-0 pt-0">
             <v-list>
               <v-list-item dense>
@@ -31,10 +39,20 @@
             </v-list>
           </v-card-text>
           <v-divider />
-          <v-card-actions v-if="schema" class="py-0">
+          <v-card-actions
+            v-if="schema"
+            class="py-0"
+          >
             <v-spacer />
-            <edit-dialog :item="topic" :schema="schema" @saved="save($event, topic)" />
-            <remove-confirm :label="topic.title" @removed="remove(topic)" />
+            <edit-dialog
+              :item="topic"
+              :schema="schema"
+              @saved="save($event, topic)"
+            />
+            <remove-confirm
+              :label="topic.title"
+              @removed="remove(topic)"
+            />
             <v-spacer />
           </v-card-actions>
         </v-card>

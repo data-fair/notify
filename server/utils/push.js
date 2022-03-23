@@ -136,7 +136,7 @@ router.post('/registrations', asyncWrap(async (req, res) => {
     await db.collection('pushSubscriptions').replaceOne(ownerFilter, sub, { upsert: true })
     const errors = await req.app.get('push')({
       recipient: req.user,
-      title: `Un nouvel appareil recevra vos notifications`,
+      title: 'Un nouvel appareil recevra vos notifications',
       body: `L'appareil ${registration.deviceName} est confirmé comme destinataire de vos notifications.`,
       date,
       icon: config.theme.notificationIcon || config.theme.logo || (config.publicUrl + '/logo-192x192.png')

@@ -1,5 +1,8 @@
 <template>
-  <v-container fluid data-iframe-height>
+  <v-container
+    fluid
+    data-iframe-height
+  >
     <div class="title mb-5">
       <v-icon class="mt-n1 mr-1">
         mdi-bell
@@ -8,18 +11,27 @@
     <v-row v-if="notifications">
       <v-col
         v-for="(notification, i) of notifications.results"
-        :key="`notification_${i}`" class="pt-0 pb-2" cols="12"
+        :key="`notification_${i}`"
+        class="pt-0 pb-2"
+        cols="12"
       >
         <v-hover
           v-slot="{ hover }"
         >
           <v-card
             :elevation="hover ? 2 : 0"
-            height="100%" rounded :href="notification && notification.url" target="_blank" outlined
+            height="100%"
+            rounded
+            :href="notification && notification.url"
+            target="_blank"
+            outlined
           >
             <v-card-text class="d-flex justify-space-between pt-1 pb-1">
               <div class="d-flex align-center">
-                <v-avatar size="40" class="mr-3 mt-1">
+                <v-avatar
+                  size="40"
+                  class="mr-3 mt-1"
+                >
                   <img
                     v-if="notification.icon && notification.icon.length && notification.icon.toString().trim().startsWith('http')"
                     :src="notification.icon"
@@ -30,17 +42,26 @@
                   </v-icon>
                 </v-avatar>
                 <div class="d-flex align-center flex-column">
-                  <div class="black--text subtitle-1" style="align-self: start;">
+                  <div
+                    class="black--text subtitle-1"
+                    style="align-self: start;"
+                  >
                     {{ typeof notification.title === 'object' ? notification.title[$i18n.locale] || notification.title['en'] || notification.title['fr'] : notification.title }}
                   </div>
-                  <div v-if="notification.body && notification.body.length" style="align-self: start;">
+                  <div
+                    v-if="notification.body && notification.body.length"
+                    style="align-self: start;"
+                  >
                     {{ notification.body }}
                   </div>
                 </div>
               </div>
-              <div class="d-flex align-center justify-end" style="flex-shrink: 0;">
+              <div
+                class="d-flex align-center justify-end"
+                style="flex-shrink: 0;"
+              >
                 <v-tooltip top>
-                  <template v-slot:activator="{ on }">
+                  <template #activator="{ on }">
                     <span v-on="on">{{ notification.date | date('fromNow') }}</span>
                   </template>
                   <span>{{ notification.date | date('LLLL') }}</span>
@@ -51,8 +72,14 @@
         </v-hover>
       </v-col>
     </v-row>
-    <div v-if="notifications && notifications.count && !(((notifications.results && notifications.results.length) || 0) >= (notifications.count || 0))" class="mt-3">
-      <v-btn block @click="page++; refresh()">
+    <div
+      v-if="notifications && notifications.count && !(((notifications.results && notifications.results.length) || 0) >= (notifications.count || 0))"
+      class="mt-3"
+    >
+      <v-btn
+        block
+        @click="page++; refresh()"
+      >
         {{ $tc('seeMore') }}
       </v-btn>
     </div>
@@ -70,8 +97,8 @@ en:
 </i18n>
 
 <script>
-import eventBus from "assets/event-bus"
-import { mapGetters, mapState } from "vuex"
+import eventBus from 'assets/event-bus'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   layout: 'embed',

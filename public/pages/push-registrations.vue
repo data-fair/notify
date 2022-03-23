@@ -1,24 +1,39 @@
 <template>
   <v-container>
     <v-row class="ma-0">
-      <register-device v-if="registrations" :registrations="registrations" @register="refresh" />
+      <register-device
+        v-if="registrations"
+        :registrations="registrations"
+        @register="refresh"
+      />
     </v-row>
-    <edit-dialog :schema="schema" @saved="push" />
+    <edit-dialog
+      :schema="schema"
+      @saved="push"
+    />
     <v-row v-if="registrations">
       <v-col
         v-for="(registration, i) in registrations"
-        :key="i" class="xs" xl="2" lg="3" md="4"
+        :key="i"
+        class="xs"
+        xl="2"
+        lg="3"
+        md="4"
         sm="6"
       >
-        <v-card :elevation="4" :disabled="registration.disabled || registration.disabledUntil">
-          <template>
-            <v-card-title class="title py-2">
-              <v-flex text-center pa-0>
-                {{ registration.deviceName }}
-              </v-flex>
-            </v-card-title>
-            <v-divider />
-          </template>
+        <v-card
+          :elevation="4"
+          :disabled="registration.disabled || registration.disabledUntil"
+        >
+          <v-card-title class="title py-2">
+            <v-flex
+              text-center
+              pa-0
+            >
+              {{ registration.deviceName }}
+            </v-flex>
+          </v-card-title>
+          <v-divider />
           <v-card-text class="px-0 pt-0">
             <v-list>
               <v-list-item dense>
@@ -36,22 +51,34 @@
                   <span><strong>Id : </strong> {{ registration.id }}</span>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item v-if="registration.lastSuccess" dense>
+              <v-list-item
+                v-if="registration.lastSuccess"
+                dense
+              >
                 <v-list-item-content>
                   <span><strong>Derrnier envoi réussi</strong> {{ registration.lastSuccess | date }}</span>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item v-if="registration.disabled === 'gone'" dense>
+              <v-list-item
+                v-if="registration.disabled === 'gone'"
+                dense
+              >
                 <v-list-item-content>
                   <span><strong>Désactivé</strong></span>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item v-if="registration.disabled === 'errors'" dense>
+              <v-list-item
+                v-if="registration.disabled === 'errors'"
+                dense
+              >
                 <v-list-item-content>
                   <span><strong>Désactivé pour cause d'erreurs en série</strong></span>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item v-if="registration.disabledUntil" dense>
+              <v-list-item
+                v-if="registration.disabledUntil"
+                dense
+              >
                 <v-list-item-content>
                   <span><strong>Désactivé temporairement pour cause d'erreur (jusqu'à {{ registration.disabledUntil | date }})</strong></span>
                 </v-list-item-content>
@@ -61,8 +88,15 @@
           <v-divider />
           <v-card-actions class="py-0">
             <v-spacer />
-            <edit-dialog :item="registration" :schema="schema" @saved="save($event, i)" />
-            <remove-confirm :label="registration.deviceName" @removed="remove(i)" />
+            <edit-dialog
+              :item="registration"
+              :schema="schema"
+              @saved="save($event, i)"
+            />
+            <remove-confirm
+              :label="registration.deviceName"
+              @removed="remove(i)"
+            />
             <v-spacer />
           </v-card-actions>
         </v-card>

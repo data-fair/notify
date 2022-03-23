@@ -16,7 +16,10 @@
         v-html="notification.errorMsg"
       />
     </div>
-    <v-btn icon @click.native="showSnackbar = false">
+    <v-btn
+      icon
+      @click.native="showSnackbar = false"
+    >
       <v-icon>mdi-close</v-icon>
     </v-btn>
   </v-snackbar>

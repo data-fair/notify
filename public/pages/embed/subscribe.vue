@@ -1,20 +1,38 @@
 <template>
-  <v-container fluid data-iframe-height>
-    <v-alert v-if="!user" type="error" style="display:inline-block;" class="my-1">
+  <v-container
+    fluid
+    data-iframe-height
+  >
+    <v-alert
+      v-if="!user"
+      type="error"
+      style="display:inline-block;"
+      class="my-1"
+    >
       Vous devez être connecté pour pouvoir recevoir des notifications.
     </v-alert>
     <template v-else>
       <v-row v-if="register && $route.query.register !== 'false' && registrations && !loading">
-        <register-device :registrations="registrations" @register="refresh" />
+        <register-device
+          :registrations="registrations"
+          @register="refresh"
+        />
       </v-row>
       <v-row>
         <v-col>
-          <v-subheader class="px-0" style="height: auto;">
+          <v-subheader
+            class="px-0"
+            style="height: auto;"
+          >
             {{ $tc('notifyMe', topics.length) }}
           </v-subheader>
         </v-col>
       </v-row>
-      <v-row v-for="topic in topics" :key="topic.key" class="ma-0">
+      <v-row
+        v-for="topic in topics"
+        :key="topic.key"
+        class="ma-0"
+      >
         <subscribe
           v-if="outputs"
           :topic="topic"

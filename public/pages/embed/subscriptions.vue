@@ -1,5 +1,8 @@
 <template>
-  <v-container fluid data-iframe-height>
+  <v-container
+    fluid
+    data-iframe-height
+  >
     <div class="title mb-5">
       <v-icon class="mt-n1 mr-1">
         mdi-rss-box
@@ -8,18 +11,25 @@
     <v-row v-if="recipientSubscriptions">
       <v-col
         v-for="(subscription, i) of recipientSubscriptions.results"
-        :key="`subscription_${i}`" class="pt-0 pb-2" cols="12"
+        :key="`subscription_${i}`"
+        class="pt-0 pb-2"
+        cols="12"
       >
         <v-hover
           v-slot="{ hover }"
         >
           <v-card
             :elevation="hover ? 2 : 0"
-            height="100%" rounded outlined
+            height="100%"
+            rounded
+            outlined
           >
             <v-card-text class="d-flex justify-space-between pt-1 pb-1">
               <div class="d-flex align-center">
-                <v-avatar size="40" class="mr-3 mt-1">
+                <v-avatar
+                  size="40"
+                  class="mr-3 mt-1"
+                >
                   <img
                     v-if="subscription.icon && subscription.icon.length && subscription.icon.toString().trim().startsWith('http')"
                     :src="subscription.icon"
@@ -30,13 +40,22 @@
                   </v-icon>
                 </v-avatar>
                 <div class="d-flex align-center flex-column">
-                  <div class="black--text subtitle-1" style="align-self: start;">
+                  <div
+                    class="black--text subtitle-1"
+                    style="align-self: start;"
+                  >
                     {{ typeof subscription.title === 'object' ? subscription.title[$i18n.locale] || subscription.title['en'] || subscription.title['fr'] : subscription.title }}
                   </div>
-                  <div v-if="subscription.topic" style="align-self: start;">
+                  <div
+                    v-if="subscription.topic"
+                    style="align-self: start;"
+                  >
                     {{ subscription.topic.title }}
                   </div>
-                  <div v-if="subscription.outputs && subscription.outputs.length" style="align-self: start;">
+                  <div
+                    v-if="subscription.outputs && subscription.outputs.length"
+                    style="align-self: start;"
+                  >
                     <v-icon v-if="subscription.outputs.includes('email')">
                       mdi-email
                     </v-icon>
@@ -46,9 +65,15 @@
                   </div>
                 </div>
               </div>
-              <div class="d-flex align-center justify-end" style="flex-shrink: 0;">
-                <v-tooltip v-if="subscription.updated" top>
-                  <template v-slot:activator="{ on }">
+              <div
+                class="d-flex align-center justify-end"
+                style="flex-shrink: 0;"
+              >
+                <v-tooltip
+                  v-if="subscription.updated"
+                  top
+                >
+                  <template #activator="{ on }">
                     <span v-on="on">{{ subscription.updated.date | date('fromNow') }}</span>
                   </template>
                   <span>{{ subscription.updated.date | date('LLLL') }}</span>
@@ -80,7 +105,7 @@ en:
 </i18n>
 
 <script>
-import { mapGetters, mapState } from "vuex"
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   layout: 'embed',

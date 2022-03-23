@@ -1,6 +1,9 @@
 <template>
   <div class="container">
-    <v-row justify="center" class="my-1">
+    <v-row
+      justify="center"
+      class="my-1"
+    >
       <v-alert
         type="error"
         style="display:inline-block"
@@ -17,8 +20,8 @@
 import { mapState } from 'vuex'
 
 export default {
-  props: ['error'],
   layout: 'embed',
+  props: ['error'],
   computed: {
     ...mapState('session', ['user'])
   }

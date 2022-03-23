@@ -6,15 +6,26 @@
     class="pa-0"
   >
     <v-card-title>
-      <v-icon v-if="registration.type === 'webpush'" :color="color">
+      <v-icon
+        v-if="registration.type === 'webpush'"
+        :color="color"
+      >
         mdi-web
       </v-icon>
-      <v-icon v-else :color="color">
+      <v-icon
+        v-else
+        :color="color"
+      >
         mdi-cellphone
       </v-icon>
       &nbsp;{{ registration.deviceName }}
       <v-spacer />
-      <v-btn icon color="warning" title="supprimer cet appareil" @click="$emit('delete')">
+      <v-btn
+        icon
+        color="warning"
+        title="supprimer cet appareil"
+        @click="$emit('delete')"
+      >
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-card-title>

@@ -3,9 +3,12 @@
     v-model="dialog"
     width="500"
   >
-    <template v-slot:activator="{ on }">
+    <template #activator="{ on }">
       <v-btn
-        icon color="warning" text v-on="on"
+        icon
+        color="warning"
+        text
+        v-on="on"
         @click="open"
       >
         <v-icon>mdi-delete</v-icon>
@@ -31,7 +34,10 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click.native="dialog = false">
+        <v-btn
+          text
+          @click.native="dialog = false"
+        >
           Annuler
         </v-btn>
         <v-btn

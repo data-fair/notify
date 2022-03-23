@@ -1,21 +1,21 @@
 module.exports = {
-  type: "object",
+  type: 'object',
   additionalProperties: false,
-  required: ["date"],
+  required: ['date'],
   readOnly: true,
   properties: {
     id: {
-      type: "string",
-      description: "Id of the user that created this issue"
+      type: 'string',
+      description: 'Id of the user that created this issue'
     },
     name: {
-      type: "string",
-      description: "Name of the user that created this issue"
+      type: 'string',
+      description: 'Name of the user that created this issue'
     },
     date: {
-      type: "string",
-      description: "Creation date of this issue",
-      format: "date-time"
+      type: 'string',
+      description: 'Creation date of this issue',
+      format: 'date-time'
     }
   }
 }

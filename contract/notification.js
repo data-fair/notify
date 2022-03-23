@@ -18,24 +18,30 @@ module.exports = (locales, noSingleLocale = false) => {
         title: 'Identifiant',
         readOnly: true
       },
-      title: noSingleLocale ? i18nMsg('Titre') : {
-        oneOf: [{
-          type: 'string',
-          title: 'Titre'
-        }, i18nMsg('Titre')]
-      },
-      body: noSingleLocale ? i18nMsg('Contenu') : {
-        oneOf: [{
-          type: 'string',
-          title: 'Contenu'
-        }, i18nMsg('Contenu')]
-      },
-      htmlBody: noSingleLocale ? i18nMsg('Contenu HTML') : {
-        oneOf: [{
-          type: 'string',
-          title: 'Contenu HTML'
-        }, i18nMsg('Contenu HTML')]
-      },
+      title: noSingleLocale
+        ? i18nMsg('Titre')
+        : {
+            oneOf: [{
+              type: 'string',
+              title: 'Titre'
+            }, i18nMsg('Titre')]
+          },
+      body: noSingleLocale
+        ? i18nMsg('Contenu')
+        : {
+            oneOf: [{
+              type: 'string',
+              title: 'Contenu'
+            }, i18nMsg('Contenu')]
+          },
+      htmlBody: noSingleLocale
+        ? i18nMsg('Contenu HTML')
+        : {
+            oneOf: [{
+              type: 'string',
+              title: 'Contenu HTML'
+            }, i18nMsg('Contenu HTML')]
+          },
       locale: {
         type: 'string',
         title: 'Langue de la notification',
@@ -43,7 +49,7 @@ module.exports = (locales, noSingleLocale = false) => {
       },
       icon: {
         type: 'string',
-        title: `URL de l'icone de la notification`
+        title: 'URL de l\'icone de la notification'
       },
       // sender is the owner of the topic
       sender: owner,
@@ -68,7 +74,7 @@ module.exports = (locales, noSingleLocale = false) => {
         type: 'object',
         title: 'utilisé pour renseigner subscription.urlTemplate et ainsi créer url',
         patternProperties: {
-          ".*": { type: 'string' }
+          '.*': { type: 'string' }
         }
       },
       url: {

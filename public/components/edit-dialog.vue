@@ -6,11 +6,23 @@
     persistent
     max-width="700px"
   >
-    <template v-slot:activator="{on}">
-      <v-btn v-if="!item" color="primary" fab dark v-on="on">
+    <template #activator="{on}">
+      <v-btn
+        v-if="!item"
+        color="primary"
+        fab
+        dark
+        v-on="on"
+      >
         <v-icon>mdi-plus</v-icon>
       </v-btn>
-      <v-btn v-else color="primary" icon text v-on="on">
+      <v-btn
+        v-else
+        color="primary"
+        icon
+        text
+        v-on="on"
+      >
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
     </template>
@@ -21,16 +33,29 @@
       </v-card-title>
 
       <v-card-text>
-        <v-form ref="form" v-model="valid">
-          <v-jsf v-if="editItem" v-model="editItem" :schema="schema" />
+        <v-form
+          ref="form"
+          v-model="valid"
+        >
+          <v-jsf
+            v-if="editItem"
+            v-model="editItem"
+            :schema="schema"
+          />
         </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click.native="dialog = false">
+        <v-btn
+          text
+          @click.native="dialog = false"
+        >
           Annuler
         </v-btn>
-        <v-btn color="primary" @click.native="confirm">
+        <v-btn
+          color="primary"
+          @click.native="confirm"
+        >
           Enregistrer
         </v-btn>
       </v-card-actions>

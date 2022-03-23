@@ -4,15 +4,35 @@ config.basePath = new URL(config.publicUrl + '/').pathname
 
 const locales = ['fr', 'en', 'de', 'it', 'es', 'pt']
 
-const vuetifyLocales = locales.reduce((a, locale) => {
-  a[locale] = require('vuetify/es5/locale/' + locale).default
-  return a
-}, {})
+const isBuilding = process.argv.slice(-1)[0] === 'build'
 
 if (process.env.NODE_ENV === 'production') {
   const nuxtConfigInject = require('@koumoul/nuxt-config-inject')
-  if (process.argv.slice(-1)[0] === 'build') config = nuxtConfigInject.prepare(config)
+  if (isBuilding) config = nuxtConfigInject.prepare(config)
   else nuxtConfigInject.replace(config, ['nuxt-dist/**/*', 'public/static/**/*'])
+}
+
+let vuetifyOptions = {}
+
+if (process.env.NODE_ENV !== 'production' || isBuilding) {
+  const vuetifyLocales = locales.reduce((a, locale) => {
+    a[locale] = require('vuetify/es5/locale/' + locale).default
+    return a
+  }, {})
+  vuetifyOptions = {
+    customVariables: ['~assets/variables.scss'],
+    theme: {
+      themes: {
+        light: config.theme.colors
+      }
+    },
+    treeShake: true,
+    defaultAssets: false,
+    lang: {
+      locales: vuetifyLocales,
+      current: config.i18n.defaultLocale
+    }
+  }
 }
 
 module.exports = {
@@ -63,20 +83,7 @@ module.exports = {
     browserBaseURL: config.basePath
   },
   buildModules: ['@nuxtjs/vuetify'],
-  vuetify: {
-    icons: {
-      iconfont: 'mdi'
-    },
-    theme: {
-      themes: {
-        light: config.theme.colors
-      }
-    },
-    lang: {
-      locales: vuetifyLocales,
-      current: 'fr'
-    }
-  },
+  vuetify: vuetifyOptions,
   env: {
     basePath: config.basePath,
     directoryUrl: config.directoryUrl,
@@ -92,5 +99,8 @@ module.exports = {
       { hid: 'description', name: 'description', content: 'Push notifications to your users.' },
       { hid: 'robots', name: 'robots', content: 'noindex' }
     ]
-  }
+  },
+  css: [
+    '@mdi/font/css/materialdesignicons.min.css'
+  ]
 }
