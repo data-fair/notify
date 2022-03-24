@@ -7,7 +7,7 @@ ADD package.json .
 ADD package-lock.json .
 # use clean-modules on the same line as npm ci to be lighter in the cache
 RUN npm ci && \
-    ./node_modules/.bin/clean-modules --yes --exclude mocha/lib/test.js --exclude "**/*.mustache"
+    ./node_modules/.bin/clean-modules --yes --exclude mocha/lib/test.js --exclude ramda/src/test.js --exclude "**/*.mustache"
 
 # Adding UI files
 ADD public public
