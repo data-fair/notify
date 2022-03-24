@@ -1,6 +1,6 @@
 const config = require('config')
 const express = require('express')
-const shortid = require('shortid')
+const { nanoid } = require('nanoid')
 const ajv = require('ajv')()
 const schema = require('../../contract/subscription')(config.i18n.locales.split(','))
 const validate = ajv.compile(schema)
@@ -14,22 +14,14 @@ router.get('', asyncWrap(async (req, res, next) => {
   const sort = findUtils.sort(req.query.sort)
   const [skip, size] = findUtils.pagination(req.query)
   const query = {}
-  if (!req.query.recipient && !(req.query.senderType && req.query.senderId)) {
-    return res.status(400).send('You must filter either with recipient or senderType/senderId params')
+  if (!req.query.recipient) {
+    return res.status(400).send('You must filter by recipient')
   }
-  if (req.query.recipient) {
-    if (req.query.recipient !== req.user.id) {
-      return res.status(403).send('You can only filter on recipient with your own id')
-    }
-    query['recipient.id'] = req.query.recipient
+  if (req.query.recipient !== req.user.id && !req.user.adminMode) {
+    return res.status(403).send('You can only filter on recipient with your own id')
   }
-  if (req.query.senderType && req.query.senderId) {
-    if (!req.query.recipient && (req.query.sendType !== req.activeAccount.type || req.query.sendId !== req.activeAccount.id || req.activeAccountRole !== 'admin')) {
-      return res.status(403).send('You can only filter on sender if your admin of it')
-    }
-    query['sender.type'] = req.query.senderType
-    query['sender.id'] = req.query.senderId
-  }
+  query['recipient.id'] = req.query.recipient
+
   if (req.query.noSender) {
     query.sender = { $exists: false }
   }
@@ -57,7 +49,7 @@ router.post('', asyncWrap(async (req, res, next) => {
   if (!valid) return res.status(400).send(validate.errors)
   req.body.title = req.body.title || `${req.body.topic.title} (${req.body.recipient.name})`
   const existingSubscription = req.body._id && await db.collection('subscriptions').findOne({ _id: req.body._id })
-  req.body._id = req.body._id || shortid.generate()
+  req.body._id = req.body._id || nanoid()
   req.body.updated = { id: req.user.id, name: req.user.name, date: new Date() }
   req.body.created = existingSubscription ? existingSubscription.created : req.body.updated
 

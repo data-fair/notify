@@ -93,12 +93,7 @@ export default {
       return `user:${this.user.id}:notifications`
     },
     schema () {
-      const schema = JSON.parse(JSON.stringify(schemaBuilder(process.env.i18n.locales.split(','), true)))
-      Object.keys(schema.properties).forEach(k => {
-        if (schema.properties[k].readOnly) delete schema.properties[k]
-        else if (schema.properties[k].type === 'object' && !schema.properties[k].properties) delete schema.properties[k]
-      })
-      return schema
+      return schemaBuilder(process.env.i18n.locales.split(','), true)
     }
   },
   async mounted () {

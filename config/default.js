@@ -42,5 +42,9 @@ module.exports = {
   i18n: {
     locales: 'fr,en',
     defaultLocale: 'fr'
+  },
+  proxyNuxt: false,
+  worker: {
+    loopInterval: 4000
   }
 }

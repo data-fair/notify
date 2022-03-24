@@ -41,6 +41,7 @@
             v-if="editItem"
             v-model="editItem"
             :schema="schema"
+            :options="{hideReadOnly: true, deleteReadOnly:true}"
           />
         </v-form>
       </v-card-text>

@@ -7,3 +7,6 @@ config/local-*
 dist
 .idea
 .vscode
+
+public/assets/css/
+public/assets/fonts/

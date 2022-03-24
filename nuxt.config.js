@@ -36,6 +36,7 @@ if (process.env.NODE_ENV !== 'production' || isBuilding) {
 }
 
 module.exports = {
+  telemetry: false,
   target: 'server',
   ssr: false,
   components: true,
@@ -82,7 +83,10 @@ module.exports = {
   axios: {
     browserBaseURL: config.basePath
   },
-  buildModules: ['@nuxtjs/vuetify'],
+  buildModules: [
+    '@nuxtjs/vuetify',
+    ['@nuxtjs/google-fonts', { download: true, display: 'swap', families: { Nunito: [100, 300, 400, 500, 700, 900] } }]
+  ],
   vuetify: vuetifyOptions,
   env: {
     basePath: config.basePath,

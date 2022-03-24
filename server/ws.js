@@ -13,7 +13,7 @@ Downstream examples:
 {type: 'error', data: {...}}
 */
 const WebSocket = require('ws')
-const shortid = require('shortid')
+const { nanoid } = require('nanoid')
 
 let cursor
 const subscribers = {}
@@ -43,7 +43,7 @@ exports.start = async ({ server, db, session }) => {
       }
 
       // Associate ws connections to ids for subscriptions
-      const clientId = shortid.generate()
+      const clientId = nanoid()
       clients[clientId] = ws
 
       // Manage subscribe/unsubscribe demands

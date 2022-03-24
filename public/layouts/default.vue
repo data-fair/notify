@@ -45,6 +45,10 @@
               Souscriptions
               <v-icon>mdi-routes</v-icon>
             </v-tab>
+            <v-tab :to="localePath({name:'webhook-subscriptions'})">
+              Webhooks
+              <v-icon>mdi-webhook</v-icon>
+            </v-tab>
             <v-tab :to="localePath({name:'notifications'})">
               Notifications
               <v-icon>mdi-bell</v-icon>

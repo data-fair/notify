@@ -1,5 +1,5 @@
 const express = require('express')
-const shortid = require('shortid')
+const { nanoid } = require('nanoid')
 const config = require('config')
 const ajv = require('ajv')()
 const schema = require('../../contract/topic')(config.i18n.locales.split(','))
@@ -45,7 +45,7 @@ router.post('', asyncWrap(async (req, res, next) => {
   const existingTopic = await db.collection('topics').findOne(idFilter)
   req.body.updated = { id: req.user.id, name: req.user.name, date: new Date() }
   req.body.created = existingTopic ? existingTopic.created : req.body.updated
-  req.body._id = existingTopic ? existingTopic._id : shortid.generate()
+  req.body._id = existingTopic ? existingTopic._id : nanoid()
   await db.collection('topics').replaceOne(idFilter, req.body, { upsert: true })
   res.status(200).json(req.body)
 }))
@@ -57,7 +57,7 @@ router.delete('/:id', asyncWrap(async (req, res, next) => {
   } else {
     await auth(false)(req, res, () => {})
     if (!req.user) return res.status(401).send()
-    if (!req.user.isAdmin && !req.activeAccountRole !== 'admin') return res.status(403).send()
+    if (!req.user.isAdmin && req.activeAccountRole !== 'admin') return res.status(403).send()
     if (!req.user.isAdmin) {
       idFilter['owner.type'] = req.activeAccount.type
       idFilter['owner.id'] = req.activeAccount.id

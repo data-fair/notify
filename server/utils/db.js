@@ -36,5 +36,8 @@ exports.init = async () => {
   await exports.ensureIndex(db, 'notifications', { 'recipient.id': 1, date: 1 }, { name: 'main-keys' })
   await exports.ensureIndex(db, 'pointers', { 'recipient.id': 1 }, { name: 'main-keys' })
   await exports.ensureIndex(db, 'pushSubscriptions', { 'owner.type': 1, 'owner.id': 1 }, { name: 'main-keys', unique: true })
+  await exports.ensureIndex(db, 'webhook-subscriptions', { 'sender.type': 1, 'sender.id': 1, 'owner.type': 1, 'owner.id': 1, 'topic.key': 1 }, { name: 'main-keys' })
+  await exports.ensureIndex(db, 'webhooks', { 'owner.type': 1, 'owner.id': 1, 'subscription._id': 1, 'notification.date': 1 }, { name: 'main-keys' })
+  await exports.ensureIndex(db, 'webhooks', { status: 1, nextAttempt: 1 }, { name: 'loop-keys' })
   return { db, client }
 }

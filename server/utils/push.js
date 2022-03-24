@@ -108,7 +108,7 @@ router.put('/registrations', asyncWrap(async (req, res) => {
   if (!req.user) return res.status(401).send()
   const db = await req.app.get('db')
   const ownerFilter = { 'owner.type': 'user', 'owner.id': req.user.id }
-  await db.collection('pushSubscriptions').findOneAndUpdate(ownerFilter, { $set: { registrations: req.body } })
+  await db.collection('pushSubscriptions').updateOne(ownerFilter, { $set: { registrations: req.body } })
   res.send(req.body)
 }))
 

@@ -6,7 +6,7 @@
     />
     <v-row>
       <v-col
-        v-for="sub in recipientSubscriptions"
+        v-for="sub in webhookSubscriptions"
         :key="sub._id"
         class="xs"
         xl="2"
@@ -38,33 +38,7 @@
               </v-list-item>
               <v-list-item dense>
                 <v-list-item-content>
-                  <span><strong>Destinataire : </strong> {{ sub.recipient.name }}</span>
-                </v-list-item-content>
-              </v-list-item>
-              <v-list-item dense>
-                <v-list-item-content>
-                  <span><strong>Sorties : </strong> {{ sub.outputs && sub.outputs.join(', ') }}</span>
-                </v-list-item-content>
-              </v-list-item>
-              <v-list-item dense>
-                <v-list-item-content>
                   <span><strong>Visibilité : </strong> {{ sub.visibility }}</span>
-                </v-list-item-content>
-              </v-list-item>
-              <v-list-item
-                v-if="sub.urlTemplate"
-                dense
-              >
-                <v-list-item-content>
-                  <span><strong>Lien : </strong> {{ sub.urlTemplate }}</span>
-                </v-list-item-content>
-              </v-list-item>
-              <v-list-item
-                v-if="sub.locale"
-                dense
-              >
-                <v-list-item-content>
-                  <span><strong>Locale : </strong> {{ sub.locale }}</span>
                 </v-list-item-content>
               </v-list-item>
             </v-list>
@@ -75,6 +49,7 @@
             class="py-0"
           >
             <v-spacer />
+            <webhook-history-dialog :subscription="sub" />
             <edit-dialog
               :item="sub"
               :schema="schema"
@@ -97,44 +72,41 @@ import { mapState, mapGetters } from 'vuex'
 import eventBus from '~/assets/event-bus'
 import EditDialog from '~/components/edit-dialog'
 import RemoveConfirm from '~/components/remove-confirm'
-const schemaBuilder = require('../../contract/subscription.js')
+const schema = require('../../contract/webhook-subscription.js')
 
 export default {
   components: { EditDialog, RemoveConfirm },
   data: () => ({
     eventBus,
-    recipientSubscriptions: null,
+    webhookSubscriptions: null,
     senderSubscriptions: null,
-    newSubscription: {}
+    newSubscription: {},
+    schema
   }),
   computed: {
     ...mapState('session', ['user']),
-    ...mapGetters('session', ['activeAccount']),
-    schema () {
-      return schemaBuilder(process.env.i18n.locales.split(','))
-    }
+    ...mapGetters('session', ['activeAccount'])
   },
   async mounted () {
     await this.refresh()
   },
   methods: {
     async refresh () {
-      this.recipientSubscriptions = (await this.$axios.$get('api/v1/subscriptions', { params: { recipient: this.user.id } })).results
-      // this.senderSubscriptions = (await this.$axios.$get('api/v1/subscriptions', { params: { senderType: this.activeAccount.type, senderId: this.activeAccount.id } })).results
+      this.webhookSubscriptions = (await this.$axios.$get('api/v1/webhook-subscriptions', { params: { owner: this.activeAccount.type + ':' + this.activeAccount.id } })).results
     },
     async save (editedSubscription, previousSubscription) {
       previousSubscription = previousSubscription || {
         sender: this.activeAccount,
-        recipient: { id: this.user.id, name: this.user.name }
+        owner: this.activeAccount
       }
-      await this.$axios.$post('api/v1/subscriptions', {
+      await this.$axios.$post('api/v1/webhook-subscriptions', {
         ...previousSubscription,
         ...editedSubscription
       })
       this.refresh()
     },
     async remove (subscription) {
-      await this.$axios.$delete('api/v1/subscriptions/' + subscription._id)
+      await this.$axios.$delete('api/v1/webhook-subscriptions/' + subscription._id)
       this.refresh()
     }
   }

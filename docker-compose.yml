@@ -21,48 +21,12 @@ services:
     ports:
       - 5680:8080
 
-  # simple mongodb cluster with sharding as notify has to be compatible with sharding
-  config01:
-    image: mongo
-    command: mongod --port 27017 --configsvr --replSet configserver
-    volumes:
-      - ./scripts:/scripts
-  config02:
-    image: mongo
-    command: mongod --port 27017 --configsvr --replSet configserver
-    volumes:
-      - ./scripts:/scripts
-  shard01a:
-    image: mongo
-    command: mongod --port 27018 --shardsvr --replSet shard01
-    volumes:
-      - ./scripts:/scripts
-  shard01b:
-    image: mongo
-    command: mongod --port 27018 --shardsvr --replSet shard01
-    volumes:
-      - ./scripts:/scripts
-  shard02a:
-    image: mongo
-    command: mongod --port 27019 --shardsvr --replSet shard02
-    volumes:
-      - ./scripts:/scripts
-  shard02b:
-    image: mongo
-    command: mongod --port 27019 --shardsvr --replSet shard02
-    volumes:
-      - ./scripts:/scripts
-  router:
-    image: mongo
-    command: mongos --port 27017 --configdb configserver/config01:27017,config02:27017 --bind_ip_all
+  mongo:
+    image: mongo:4.2
     ports:
-      - "27017:27017"
+      - 27017:27017
     volumes:
-      - ./scripts:/scripts
-    depends_on:
-      - config01
-      - config02
-      - shard01a
-      - shard01b
-      - shard02a
-      - shard02b
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

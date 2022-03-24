@@ -1,10 +1,10 @@
 const express = require('express')
-const shortid = require('shortid')
+const { nanoid } = require('nanoid')
 const config = require('config')
-const axios = require('axios')
 const ajv = require('ajv')()
 const schema = require('../../contract/notification')(config.i18n.locales.split(','))
 const validate = ajv.compile(schema)
+const axios = require('../utils/axios')
 const asyncWrap = require('../utils/async-wrap')
 const findUtils = require('../utils/find')
 const auth = require('../utils/auth')
@@ -53,7 +53,7 @@ const prepareNotifSubscription = (originalNotification, subscription) => {
     icon: subscription.icon || config.theme.notificationIcon || config.theme.logo || (config.publicUrl + '/logo-192x192.png'),
     locale: subscription.locale,
     ...originalNotification, // this is after setting icon/locale, so it takes precedence
-    _id: shortid.generate(),
+    _id: nanoid(),
     recipient: subscription.recipient
   }
   if (subscription.outputs && (!notification.outputs || !notification.outputs.length)) {
@@ -104,6 +104,29 @@ const sendNotification = async (req, notification) => {
   }
 }
 
+const createWebhook = async (req, notification, webhookSubscription) => {
+  const webhook = {
+    _id: nanoid(),
+    sender: webhookSubscription.sender,
+    owner: webhookSubscription.owner,
+    subscription: {
+      _id: webhookSubscription._id,
+      title: webhookSubscription.title
+    },
+    notification: {
+      title: notification.title,
+      body: notification.body,
+      topic: notification.topic,
+      url: notification.url,
+      date: notification.date,
+      extra: notification.extra
+    },
+    status: 'waiting',
+    nbAttempts: 0
+  }
+  await req.app.get('db').collection('webhooks').insertOne(webhook)
+}
+
 // push a notification
 router.post('', asyncWrap(async (req, res, next) => {
   const db = req.app.get('db')
@@ -115,6 +138,7 @@ router.post('', asyncWrap(async (req, res, next) => {
     await auth(false)(req, res, () => {})
     if (!req.user) return res.status(401).send()
     notification.sender = req.activeAccount
+    notification.recipient = notification.recipient || { id: req.user.id, name: req.user.name }
     if (!req.user.adminMode && (!notification.recipient || notification.recipient.id !== req.user.id)) {
       return res.status(403).send()
     }
@@ -128,19 +152,19 @@ router.post('', asyncWrap(async (req, res, next) => {
   // prepare the filter to find the topics matching this subscription
   const topicParts = notification.topic.key.split(':')
   const topicKeys = topicParts.map((part, i) => topicParts.slice(0, i + 1).join(':'))
-  const filter = { 'topic.key': { $in: topicKeys } }
-  if (notification.visibility === 'private') filter.visibility = 'private'
+  const subscriptionsFilter = { 'topic.key': { $in: topicKeys } }
+  if (notification.visibility === 'private') subscriptionsFilter.visibility = 'private'
   if (notification.sender) {
-    filter['sender.type'] = notification.sender.type
-    filter['sender.id'] = notification.sender.id
+    subscriptionsFilter['sender.type'] = notification.sender.type
+    subscriptionsFilter['sender.id'] = notification.sender.id
   } else {
-    filter.sender = { $exists: false }
+    subscriptionsFilter.sender = { $exists: false }
   }
   if (notification.recipient) {
-    filter['recipient.id'] = notification.recipient.id
+    subscriptionsFilter['recipient.id'] = notification.recipient.id
   }
   let nbSent = 0
-  for await (const subscription of db.collection('subscriptions').find(filter)) {
+  for await (const subscription of db.collection('subscriptions').find(subscriptionsFilter)) {
     await sendNotification(req, prepareNotifSubscription(notification, subscription))
     nbSent += 1
   }
@@ -149,6 +173,12 @@ router.post('', asyncWrap(async (req, res, next) => {
   // the subscription might still have been used to customize locale, outputs, etc.. but it is not required
   if (notification.recipient && !nbSent) {
     await sendNotification(req, notification)
+  }
+
+  const webhookSubscriptionssFilter = { ...subscriptionsFilter }
+  delete webhookSubscriptionssFilter['recipient.id']
+  for await (const webhookSubscription of db.collection('webhook-subscriptions').find(webhookSubscriptionssFilter)) {
+    await createWebhook(req, notification, webhookSubscription)
   }
 
   res.status(200).json(notification)

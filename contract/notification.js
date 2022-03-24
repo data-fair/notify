@@ -1,4 +1,4 @@
-const owner = require('./partial/owner')
+const sender = require('./partial/sender')
 const recipient = require('./partial/recipient')
 const topicRef = require('./partial/topic-ref')
 
@@ -52,7 +52,7 @@ module.exports = (locales, noSingleLocale = false) => {
         title: 'URL de l\'icone de la notification'
       },
       // sender is the owner of the topic
-      sender: owner,
+      sender,
       topic: topicRef,
       // it will be the recipient of the matched subscription
       recipient,
