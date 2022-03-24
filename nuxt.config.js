@@ -1,4 +1,3 @@
-const webpack = require('webpack')
 let config = { ...require('config') }
 config.basePath = new URL(config.publicUrl + '/').pathname
 
@@ -48,6 +47,8 @@ module.exports = {
     // always the same url to fetch static resource, event in multi-domain mode
     publicPath: config.publicUrl + '/_nuxt/',
     extend (config, { isServer, isDev, isClient }) {
+      const webpack = require('webpack')
+
       // config.optimization.minimize = false
       // Ignore all locale files of moment.js, those we want are loaded in plugins/moment.js
       config.plugins.push(new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/))
