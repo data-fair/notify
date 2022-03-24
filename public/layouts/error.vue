@@ -1,5 +1,8 @@
 <template>
-  <div class="container">
+  <div
+    class="container"
+    data-iframe-height
+  >
     <v-row
       justify="center"
       class="my-1"
