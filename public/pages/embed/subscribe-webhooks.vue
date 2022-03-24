@@ -9,15 +9,15 @@
       style="display:inline-block;"
       class="my-1"
     >
-      {{ $t(logged) }}
+      {{ $t('logged') }}
     </v-alert>
     <v-alert
-      v-else-if="activeAccount.type !== 'user' && activeAccount.role !== 'admin'"
+      v-else-if="!isAccountAdmin"
       type="error"
       style="display:inline-block;"
       class="my-1"
     >
-      {{ $t(admin) }}
+      {{ $t('admin') }}
     </v-alert>
     <template v-else>
       <template v-for="topic in topics">
@@ -57,17 +57,9 @@ fr:
 import { mapState, mapGetters } from 'vuex'
 export default {
   layout: 'embed',
-  data () {
-    return {
-      register: false,
-      loading: null,
-      registrations: null,
-      outputs: null
-    }
-  },
   computed: {
     ...mapState('session', ['user']),
-    ...mapGetters('session', ['activeAccount']),
+    ...mapGetters('session', ['isAccountAdmin']),
     topics () {
       const keys = this.$route.query.key.split(',')
       const titles = this.$route.query.title.split(',')
@@ -77,21 +69,6 @@ export default {
       if (!this.$route.query.sender) return null
       const [type, id] = this.$route.query.sender.split(':')
       return { type, id }
-    }
-  },
-  mounted () {
-    this.refresh()
-  },
-  methods: {
-    async refresh () {
-      this.loading = true
-      this.registrations = await this.$axios.$get('api/v1/push/registrations')
-      if (this.$route.query.outputs === 'auto') {
-        const outputs = ['email']
-        if (this.registrations.find(r => !r.disabled)) outputs.push('devices')
-        this.outputs = outputs
-      }
-      this.loading = false
     }
   }
 }
