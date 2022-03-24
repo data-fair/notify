@@ -29,8 +29,8 @@
     <v-list-item-content>
       <v-list-item-title>
         {{ webhook.notification.date | date }} - {{ $t(webhook.status) }}
-        <template v-if="webhook.status === 'error' && webhook.lastAttempt.status">
-          {{ webhook.lastAttempt.status }}
+        <template v-if="webhook.status === 'error' && webhook.lastAttempt">
+          {{ webhook.lastAttempt.status || webhook.lastAttempt.error }}
         </template>
       </v-list-item-title>
       <v-list-item-subtitle>

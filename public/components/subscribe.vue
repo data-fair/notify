@@ -72,13 +72,11 @@ export default {
         topic: this.topic.key
       }
       if (this.noSender) {
-        params.noSender = 'true'
+        params.sender = 'none'
       } else if (this.sender) {
-        params.senderType = this.sender.type
-        params.senderId = this.sender.id
+        params.sender = this.sender.type + ':' + this.sender.id
       } else {
-        params.senderType = this.activeAccount.type
-        params.senderId = this.activeAccount.id
+        params.sender = this.activeAccount.type + ':' + this.activeAccount.id
       }
       this.subscription = (await this.$axios.$get('api/v1/subscriptions', { params })).results[0]
       if (this.subscription) {

@@ -41,7 +41,8 @@ const loop = async (db) => {
         headers[subscription.header.key] = subscription.header.value
       }
       debug('send webhook', subscription.url, webhook.notification)
-      const res = await axios.post(subscription.url, webhook.notification, { headers })
+      const res = await axios.post(subscription.url, webhook.notification, { headers, timeout: 2000 })
+      debug('webhook success')
       await db.collection('webhooks').updateOne({ _id: webhook._id }, {
         $set: {
           status: 'ok',
@@ -52,10 +53,13 @@ const loop = async (db) => {
       })
     } catch (err) {
       debug('webhook failed', err)
+      const attempt = { date }
+      if (err.status) attempt.status = err.status
+      else attempt.error = err.message
       const patch = {
         $set: {
           status: 'error',
-          lastAttempt: { date, status: err.status }
+          lastAttempt: attempt
         },
         $inc: { nbAttempts: 1 }
       }

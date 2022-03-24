@@ -22,8 +22,16 @@ router.get('', asyncWrap(async (req, res, next) => {
   }
   query['recipient.id'] = req.query.recipient
 
-  if (req.query.noSender) {
+  // noSender/senderType/senderId are kept for compatibility but shoud be replace by simply sender
+
+  if (req.query.noSender || req.query.sender === 'none') {
     query.sender = { $exists: false }
+  } else if (req.query.senderType && req.query.senderId) {
+    query['sender.type'] = req.query.senderType
+    query['sender.id'] = req.query.senderId
+  } else if (req.query.sender) {
+    query['sender.type'] = req.query.sender.split(':')[0]
+    query['sender.id'] = req.query.sender.split(':')[1]
   }
   if (req.query.topic) {
     query['topic.key'] = req.query.topic

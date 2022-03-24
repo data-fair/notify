@@ -5,26 +5,27 @@ const schema = require('../../contract/webhook-subscription')
 const validate = ajv.compile(schema)
 const asyncWrap = require('../utils/async-wrap')
 const findUtils = require('../utils/find')
+const { createWebhook } = require('../utils/webhooks')
 
 const router = express.Router()
 
 // Get the list of subscriptions
 router.get('', asyncWrap(async (req, res, next) => {
+  if (!req.user) return res.status(401).send()
+  if (!req.user.adminMode && req.activeAccountRole !== 'admin') {
+    return res.status(403).send('Only an admin can manage webhooks')
+  }
   const sort = findUtils.sort(req.query.sort)
   const [skip, size] = findUtils.pagination(req.query)
   const query = {}
-  if (!req.query.owner) {
-    return res.status(400).send('You must filter by owner')
-  }
-  const [ownerType, ownerId] = req.query.owner.split(':')
-  if ((ownerType !== req.activeAccount.type || ownerId !== req.activeAccount.id) && !req.user.adminMode) {
-    return res.status(403).send('You can only filter on owner with your current account')
-  }
-  query['owner.type'] = ownerType
-  query['owner.id'] = ownerId
+  query['owner.type'] = req.activeAccount.type
+  query['owner.id'] = req.activeAccount.id
 
-  if (req.query.noSender) {
+  if (req.query.sender === 'none') {
     query.sender = { $exists: false }
+  } else if (req.query.sender) {
+    query['sender.type'] = req.query.sender.split(':')[0]
+    query['sender.id'] = req.query.sender.split(':')[1]
   }
   if (req.query.topic) {
     query['topic.key'] = req.query.topic
@@ -42,8 +43,10 @@ router.get('', asyncWrap(async (req, res, next) => {
 router.post('', asyncWrap(async (req, res, next) => {
   if (!req.user) return res.status(401).send()
   if (!req.user.adminMode && req.activeAccountRole !== 'admin') {
-    return res.status(403).send('Only an admin can create manage webhooks')
+    return res.status(403).send('Only an admin can manage webhooks')
   }
+
+  const owner = req.body.owner = req.activeAccount
 
   const valid = validate(req.body)
   if (!valid) return res.status(400).send(validate.errors)
@@ -55,7 +58,6 @@ router.post('', asyncWrap(async (req, res, next) => {
   req.body.created = existingWebhookSubscription ? existingWebhookSubscription.created : req.body.updated
 
   const sender = req.body.sender
-  const owner = req.activeAccount
 
   req.body.visibility = req.body.visibility || 'private'
   if (req.user.adminMode) {
@@ -80,6 +82,21 @@ router.delete('/:id', asyncWrap(async (req, res, next) => {
     .findOne(filter)
   if (!subscription) return res.status(404).send()
   await req.app.get('db').collection('webhook-subscriptions').deleteOne(filter)
+  res.status(204).send()
+}))
+
+router.post('/:id/_test', asyncWrap(async (req, res, next) => {
+  if (!req.user) return res.status(401).send()
+  if (!req.user.adminMode && req.activeAccountRole !== 'admin') return res.status(403).send()
+  const filter = { _id: req.params.id, 'owner.type': req.activeAccount.type, 'owner.id': req.activeAccount.id }
+  const subscription = await req.app.get('db').collection('webhook-subscriptions')
+    .findOne(filter)
+  if (!subscription) return res.status(404).send()
+  await createWebhook(req, {
+    title: 'Test webhook',
+    topic: { key: 'test', title: 'Test' },
+    date: new Date()
+  }, subscription)
   res.status(204).send()
 }))
 

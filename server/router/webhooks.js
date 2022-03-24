@@ -7,7 +7,7 @@ const router = express.Router()
 router.get('', asyncWrap(async (req, res, next) => {
   if (!req.user) return res.status(401).send()
   if (!req.user.adminMode && req.activeAccountRole !== 'admin') {
-    return res.status(403).send('Only an admin can create manage webhooks')
+    return res.status(403).send('Only an admin can manage webhooks')
   }
   const db = req.app.get('db')
   const sort = { 'notification.date': -1 }
@@ -24,7 +24,7 @@ router.get('', asyncWrap(async (req, res, next) => {
 router.post('/:id/_retry', asyncWrap(async (req, res, next) => {
   if (!req.user) return res.status(401).send()
   if (!req.user.adminMode && req.activeAccountRole !== 'admin') {
-    return res.status(403).send('Only an admin can create manage webhooks')
+    return res.status(403).send('Only an admin can manage webhooks')
   }
   const webhook = (await req.app.get('db').collection('webhooks').findOneAndUpdate(
     { _id: req.params.id, 'owner.type': req.activeAccount.type, 'owner.id': req.activeAccount.id },
@@ -37,7 +37,7 @@ router.post('/:id/_retry', asyncWrap(async (req, res, next) => {
 router.post('/:id/_cancel', asyncWrap(async (req, res, next) => {
   if (!req.user) return res.status(401).send()
   if (!req.user.adminMode && req.activeAccountRole !== 'admin') {
-    return res.status(403).send('Only an admin can create manage webhooks')
+    return res.status(403).send('Only an admin can manage webhooks')
   }
   const webhook = (await req.app.get('db').collection('webhooks').findOneAndUpdate(
     { _id: req.params.id, 'owner.type': req.activeAccount.type, 'owner.id': req.activeAccount.id },

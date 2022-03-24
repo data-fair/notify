@@ -8,6 +8,7 @@ const axios = require('../utils/axios')
 const asyncWrap = require('../utils/async-wrap')
 const findUtils = require('../utils/find')
 const auth = require('../utils/auth')
+const { createWebhook } = require('../utils/webhooks')
 const urlTemplate = require('url-template')
 const debug = require('debug')('notifications')
 const router = express.Router()
@@ -102,29 +103,6 @@ const sendNotification = async (req, notification) => {
       console.error('Failed to send mail', err)
     })
   }
-}
-
-const createWebhook = async (req, notification, webhookSubscription) => {
-  const webhook = {
-    _id: nanoid(),
-    sender: webhookSubscription.sender,
-    owner: webhookSubscription.owner,
-    subscription: {
-      _id: webhookSubscription._id,
-      title: webhookSubscription.title
-    },
-    notification: {
-      title: notification.title,
-      body: notification.body,
-      topic: notification.topic,
-      url: notification.url,
-      date: notification.date,
-      extra: notification.extra
-    },
-    status: 'waiting',
-    nbAttempts: 0
-  }
-  await req.app.get('db').collection('webhooks').insertOne(webhook)
 }
 
 // push a notification
