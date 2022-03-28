@@ -4,6 +4,7 @@ const config = require('config')
 const cookieParser = require('cookie-parser')
 const eventToPromise = require('event-to-promise')
 const http = require('http')
+const cors = require('cors')
 const session = require('@koumoul/sd-express')({
   directoryUrl: config.directoryUrl,
   privateDirectoryUrl: config.privateDirectoryUrl
@@ -58,7 +59,7 @@ app.get('/api/v1/admin/info', auth(true), (req, res) => {
 let wss
 exports.start = async () => {
   const nuxt = await require('./nuxt')()
-  app.use(nuxt.render)
+  app.use(cors(), nuxt.render)
   const { db, client } = await require('./utils/db').init()
   await require('../upgrade')(db)
   app.set('db', db)
