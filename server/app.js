@@ -1,3 +1,4 @@
+const EventEmitter = require('events')
 const express = require('express')
 const bodyParser = require('body-parser')
 const config = require('config')
@@ -13,6 +14,9 @@ const status = require('./status')
 const ws = require('./ws')
 const webhooksWorker = require('./webhooks-worker')
 const auth = require('./utils/auth')
+
+// a global event emitter for testing
+global.events = new EventEmitter()
 
 const app = express()
 app.set('json spaces', 2)
