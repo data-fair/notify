@@ -23,8 +23,8 @@ ADD upgrade upgrade
 # Check quality
 ADD .gitignore .gitignore
 RUN npm run lint
-# ADD test test
-# RUN npm run test
+ADD test test
+RUN npm run test
 
 # Build UI
 ENV NODE_ENV production
