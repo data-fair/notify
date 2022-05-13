@@ -43,6 +43,7 @@ fr:
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+const { serializeSender } = require('~/assets/sender-utils')
 
 export default {
   props: {
@@ -74,9 +75,9 @@ export default {
       if (this.noSender) {
         params.sender = 'none'
       } else if (this.sender) {
-        params.sender = this.sender.type + ':' + this.sender.id
+        params.sender = serializeSender(this.sender, true)
       } else {
-        params.sender = this.activeAccount.type + ':' + this.activeAccount.id
+        params.sender = serializeSender(this.activeAccount, false)
       }
       this.subscription = (await this.$axios.$get('api/v1/subscriptions', { params })).results[0]
       if (this.subscription) {

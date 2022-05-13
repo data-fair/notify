@@ -32,7 +32,7 @@ exports.init = async () => {
   console.log('Connecting to mongodb ' + config.mongoUrl)
   const { db, client } = await exports.connect()
   await exports.ensureIndex(db, 'topics', { 'owner.type': 1, 'owner.id': 1, key: 1 }, { name: 'main-keys', unique: true })
-  await exports.ensureIndex(db, 'subscriptions', { 'sender.type': 1, 'sender.id': 1, 'recipient.id': 1, 'topic.key': 1 }, { name: 'main-keys', unique: true })
+  await exports.ensureIndex(db, 'subscriptions', { 'sender.type': 1, 'sender.id': 1, 'sender.department': 1, 'sender.role': 1, 'recipient.id': 1, 'topic.key': 1 }, { name: 'main-keys', unique: true })
   await exports.ensureIndex(db, 'notifications', { 'recipient.id': 1, date: 1 }, { name: 'main-keys' })
   await exports.ensureIndex(db, 'pointers', { 'recipient.id': 1 }, { name: 'main-keys' })
   await exports.ensureIndex(db, 'pushSubscriptions', { 'owner.type': 1, 'owner.id': 1 }, { name: 'main-keys', unique: true })

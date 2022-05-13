@@ -12,6 +12,12 @@
         "clear": "passwd"
     }
 }, {
+    "id": "user2",
+    "email": "user2@test.com",
+    "password": {
+        "clear": "passwd"
+    }
+}, {
     "id": "admin1",
     "email": "admin1@test.com",
     "password": {

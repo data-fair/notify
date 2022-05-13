@@ -59,6 +59,15 @@ app.get('/api/v1/admin/info', auth(true), (req, res) => {
   res.send({ ...info, config })
 })
 
+// Error management
+app.use((err, req, res, next) => {
+  const status = err.statusCode || err.status || 500
+  if (status === 500) console.error('Error in express route', err)
+  res.set('Cache-Control', 'no-cache')
+  res.set('Expires', '-1')
+  res.status(status).send(err.message)
+})
+
 // Run app and return it in a promise
 let wss
 exports.start = async () => {

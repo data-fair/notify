@@ -55,6 +55,7 @@ fr:
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+const { parseSender } = require('~/assets/sender-utils')
 export default {
   layout: 'embed',
   computed: {
@@ -67,8 +68,7 @@ export default {
     },
     sender () {
       if (!this.$route.query.sender) return null
-      const [type, id] = this.$route.query.sender.split(':')
-      return { type, id }
+      return parseSender(this.$route.query.sender)
     }
   }
 }

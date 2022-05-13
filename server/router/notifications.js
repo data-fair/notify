@@ -77,6 +77,7 @@ const sendNotification = async (req, notification) => {
   if (!notification.locale) notification.locale = config.i18n.defaultLocale
   if (!notification.title) notification.title = notification.topic.title || notification.topic.key
   notification = localize(notification)
+  global.events.emit('saveNotification', notification)
   await req.app.get('db').collection('notifications').insertOne(notification)
   debug('Send WS notif', notification.recipient, notification)
   req.app.get('publishWS')([`user:${notification.recipient.id}:notifications`], notification)
@@ -85,6 +86,7 @@ const sendNotification = async (req, notification) => {
     req.app.get('push')(notification).catch(err => console.error('Failed to send push notification', err))
   }
   if (notification.outputs && notification.outputs.includes('email')) {
+    global.events.emit('sentNotification', { output: 'email', notification })
     debug('Send notif to email address')
     let text = notification.body || ''
     let simpleHtml = `<p>${notification.body || ''}</p>`
@@ -135,6 +137,14 @@ router.post('', asyncWrap(async (req, res, next) => {
   if (notification.sender) {
     subscriptionsFilter['sender.type'] = notification.sender.type
     subscriptionsFilter['sender.id'] = notification.sender.id
+    if (notification.sender.role) subscriptionsFilter['sender.role'] = notification.sender.role
+    if (notification.sender.department) {
+      if (notification.sender.department !== '*') {
+        subscriptionsFilter['sender.department'] = notification.sender.department
+      }
+    } else {
+      subscriptionsFilter['sender.department'] = { $exists: false }
+    }
   } else {
     subscriptionsFilter.sender = { $exists: false }
   }

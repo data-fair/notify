@@ -14,13 +14,11 @@ router.get('', asyncWrap(async (req, res, next) => {
   const sort = findUtils.sort(req.query.sort)
   const [skip, size] = findUtils.pagination(req.query)
   const query = {}
-  if (!req.query.recipient) {
-    return res.status(400).send('You must filter by recipient')
-  }
-  if (req.query.recipient !== req.user.id && !req.user.adminMode) {
+  const recipient = req.query.recipient || req.user.id
+  if (recipient !== req.user.id && !req.user.adminMode) {
     return res.status(403).send('You can only filter on recipient with your own id')
   }
-  query['recipient.id'] = req.query.recipient
+  query['recipient.id'] = recipient
 
   // noSender/senderType/senderId are kept for compatibility but shoud be replace by simply sender
 
@@ -30,8 +28,11 @@ router.get('', asyncWrap(async (req, res, next) => {
     query['sender.type'] = req.query.senderType
     query['sender.id'] = req.query.senderId
   } else if (req.query.sender) {
-    query['sender.type'] = req.query.sender.split(':')[0]
-    query['sender.id'] = req.query.sender.split(':')[1]
+    const senderParts = req.query.sender.split(':')
+    query['sender.type'] = senderParts[0]
+    query['sender.id'] = senderParts[1]
+    if (senderParts[2]) query['sender.department'] = senderParts[2]
+    if (senderParts[3]) query['sender.role'] = senderParts[3]
   }
   if (req.query.topic) {
     query['topic.key'] = req.query.topic
@@ -45,16 +46,43 @@ router.get('', asyncWrap(async (req, res, next) => {
   res.json({ results, count })
 }))
 
+const canSubscribePrivate = (sender, user) => {
+  // super admin can do whatever he wants
+  if (user.adminMode) return true
+  if (!sender) return false
+
+  // user sends to himself ?
+  if (sender.type === 'user') return sender.id === user.id
+
+  if (sender.type === 'organization') {
+    const userOrg = user.organizations.find(o => o.id === sender.id)
+    if (!userOrg) return false
+    if (userOrg.department && userOrg.department !== sender.department) return false
+    if (sender.role && sender.role !== userOrg.role) return false
+    return true
+  }
+}
+
 // Create a subscription
 router.post('', asyncWrap(async (req, res, next) => {
   const db = req.app.get('db')
+
+  req.body.outputs = req.body.outputs || []
+
   // maintain compatibility with deprecated "web" output
-  if (req.body.outputs && req.body.outputs.includes('web')) {
+  if (req.body.outputs.includes('web')) {
     req.body.outputs = req.body.outputs.filter(o => o !== 'web').concat(['devices'])
+  }
+
+  const user = req.user
+  req.body.recipient = req.body.recipient || { id: user.id, name: user.name }
+  if (req.body.recipient.id !== req.user.id && !user.adminMode) {
+    return res.status(403).send('Impossible de créer un abonnement pour un autre utilisateur')
   }
 
   const valid = validate(req.body)
   if (!valid) return res.status(400).send(validate.errors)
+
   req.body.title = req.body.title || `${req.body.topic.title} (${req.body.recipient.name})`
   const existingSubscription = req.body._id && await db.collection('subscriptions').findOne({ _id: req.body._id })
   req.body._id = req.body._id || nanoid()
@@ -62,20 +90,9 @@ router.post('', asyncWrap(async (req, res, next) => {
   req.body.created = existingSubscription ? existingSubscription.created : req.body.updated
 
   const sender = req.body.sender
-  const recipient = req.body.recipient
-  const user = req.user
-  if (recipient.id !== req.user.id && !user.adminMode) {
-    return res.status(403).send('Impossible de créer un abonnement pour un autre utilisateur')
-  }
 
   req.body.visibility = req.body.visibility || 'private'
-  if (user.adminMode) {
-    // super admin can do whatever he wants
-  } else if (sender && sender.type === 'user' && sender.id === req.user.id) {
-    // user sends to himself, ok
-  } else if (sender && sender.type === 'organization' && !!req.user.organizations.find(o => o.id === req.body.sender.id)) {
-    // user subscribes to topic from orga where he is member, ok
-  } else {
+  if (!canSubscribePrivate(sender, user)) {
     // other cases are accepted, but the subscription will only receive notifications
     // with public visibility
     req.body.visibility = 'public'

@@ -2,7 +2,7 @@ const assert = require('assert').strict
 
 describe('Notifications', () => {
   it('should reject wrong secret  key', async () => {
-    await assert.rejects(global.ax.ano.post('/api/v1/notifications', { params: { key: 'badkey' } }), (err) => {
+    await assert.rejects(global.ax.ano.post('/api/v1/notifications', {}, { params: { key: 'badkey' } }), (err) => {
       assert.equal(err.status, 401)
       return true
     })
@@ -15,9 +15,9 @@ describe('Notifications', () => {
     })
   })
 
-  it.only('should send a notification straight to a user', async () => {
+  it('should send a notification straight to a user', async () => {
     let res = await global.ax.push.post('/api/v1/notifications', {
-      topic: { key: 'topic' },
+      topic: { key: 'topic1' },
       title: 'a notification',
       recipient: { id: 'user1' }
     })

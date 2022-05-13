@@ -34,7 +34,9 @@ before('init globals', async () => {
     global.ax.builder(null, null, { params: { key: config.secretKeys.notifications } }).then(ax => { global.ax.push = ax }),
     global.ax.builder('superadmin@test.com:superpasswd:adminMode').then(ax => { global.ax.superadmin = ax }),
     global.ax.builder('admin1@test.com:passwd').then(ax => { global.ax.admin1 = ax }),
-    global.ax.builder('user1@test.com:passwd').then(ax => { global.ax.user1 = ax })
+    global.ax.builder('user1@test.com:passwd').then(ax => { global.ax.user1 = ax }),
+    global.ax.builder('user1@test.com:passwd', 'orga1').then(ax => { global.ax.user1orga1 = ax }),
+    global.ax.builder('user2@test.com:passwd').then(ax => { global.ax.user2 = ax })
   ])
 
   debug('init globals ok')

@@ -1,6 +1,9 @@
 version: '3'
 services:
   sd:
+    profiles:
+      - dev
+      - test
     image: koumoul/simple-directory:master
     network_mode: host
     environment:
@@ -18,11 +21,16 @@ services:
       - ./test/resources/organizations.json:/webapp/data/organizations.json
 
   openapi-viewer:
+    profiles:
+      - dev
     image: koumoul/openapi-viewer:1
     ports:
       - 5680:8080
 
   mongo:
+    profiles:
+      - dev
+      - test
     image: mongo:4.2
     ports:
       - 27017:27017
