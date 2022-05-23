@@ -66,7 +66,7 @@ import { mapState, mapGetters } from 'vuex'
 import eventBus from '~/assets/event-bus'
 import EditDialog from '~/components/edit-dialog'
 import RemoveConfirm from '~/components/remove-confirm'
-const schema = JSON.parse(JSON.stringify(require('../../../contract/topic.js')))
+const schema = require('../../../contract/topic.js')()
 schema.properties.owner.readOnly = false
 schema.properties.owner.title = ''
 delete schema.properties.owner.properties.id

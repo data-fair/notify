@@ -2,136 +2,79 @@
   <v-app>
     <v-app-bar
       v-if="user"
-      :height="$vuetify.breakpoint.mdAndDown ? 134 : 72"
       app
+      fixed
+      dense
+      flat
     >
-      <v-layout
-        wrap
-        align-center
-      >
-        <v-flex
-          xs6
-          sm4
-          md3
-          lg2
-          text-left
+      <div class="logo-container">
+        <nuxt-link
+          :to="localePath('index')"
+          title="Accueil"
         >
-          <div class="logo-container">
-            <img
-              v-if="env.theme.logo"
-              :src="env.theme.logo"
-            >
-            <img
-              v-else
-              src="../static/logo.svg"
-            >
-          </div>
-        </v-flex>
-        <v-flex
-          lg8
-          order-lg2
-          xs12
-          order-xs3
-        >
-          <v-tabs
-            centered
-            icons-and-text
-            grow
-            show-arrows
-            color="dark"
+          <img
+            v-if="env.theme.logo"
+            :src="env.theme.logo"
           >
-            <v-tabs-slider color="accent" />
-            <v-tab :to="localePath({name:'subscriptions'})">
-              Souscriptions
-              <v-icon>mdi-routes</v-icon>
-            </v-tab>
-            <v-tab :to="localePath({name:'webhook-subscriptions'})">
-              Webhooks
-              <v-icon>mdi-webhook</v-icon>
-            </v-tab>
-            <v-tab :to="localePath({name:'notifications'})">
-              Notifications
-              <v-icon>mdi-bell</v-icon>
-            </v-tab>
-            <v-tab :to="localePath({name:'push-registrations'})">
-              Appareils
-              <v-icon>mdi-devices</v-icon>
-            </v-tab>
-          </v-tabs>
-        </v-flex>
-        <v-flex
-          xs6
-          sm8
-          md9
-          order-xs2
-          lg2
-          order-lg3
-          text-right
-          text-lg-center
-        >
-          <v-menu
-            v-if="activeAccount"
-            offset-y
-            left
+          <img
+            v-else
+            src="../static/logo.svg"
           >
-            <template #activator="{ on }">
-              <v-btn
-                v-if="activeAccount"
-                id="toolbar-button-account"
-                text
-                large
-                v-on="on"
-              >
-                {{ activeAccount.type === 'user' ? 'personnel' : 'organisation ' }}<br> {{ activeAccount.name }} <v-icon>mdi-chevron-down</v-icon>
-              </v-btn>
-            </template>
-            <v-list>
-              <template v-if="user.organizations && user.organizations.length">
-                <v-subheader>Changer de compte</v-subheader>
-                <v-list-item
-                  v-if="activeAccount.type !== 'user'"
-                  @click="switchOrganization()"
-                >
-                  <v-list-item-title>Compte personnel</v-list-item-title>
-                </v-list-item>
-                <v-list-item
-                  v-for="organization in user.organizations.filter(o => activeAccount.type === 'user' || activeAccount.id !== o.id)"
-                  :key="organization.id"
-                  @click="switchOrganization(organization.id)"
-                >
-                  <v-list-item-title>Organisation {{ organization.name }}</v-list-item-title>
-                </v-list-item>
-                <v-divider />
-              </template>
-
-              <v-list
-                v-if="user.isAdmin"
-                color="red"
-                dark
-              >
-                <v-subheader>Administration</v-subheader>
-                <v-list-item to="/admin/global-topics">
-                  <v-list-item-title>Sujets globaux</v-list-item-title>
-                </v-list-item>
-              </v-list>
-
-              <v-list-item
-                id="toolbar-menu-logout"
-                color="warning"
-                @click="logout"
-              >
-                <v-list-item-icon>
-                  <v-icon color="warning">
-                    mdi-close-circle-outline
-                  </v-icon>
-                </v-list-item-icon>
-                <v-list-item-title>Déconnexion</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-          <lang-switcher style="position: absolute; right: 8px; top: 16px;" />
-        </v-flex>
-      </v-layout>
+        </nuxt-link>
+      </div>
+      <v-spacer />
+      <v-toolbar-items>
+        <v-tabs
+          centered
+          grow
+          show-arrows
+          dense
+          background-color="transparent"
+        >
+          <v-tabs-slider color="accent" />
+          <v-tab
+            :to="localePath({name:'subscriptions'})"
+            color="transparent"
+          >
+            Souscriptions
+            <v-icon class="mx-4">
+              mdi-routes
+            </v-icon>
+          </v-tab>
+          <v-tab :to="localePath({name:'webhook-subscriptions'})">
+            Webhooks
+            <v-icon class="mx-4">
+              mdi-webhook
+            </v-icon>
+          </v-tab>
+          <v-tab :to="localePath({name:'notifications'})">
+            Notifications
+            <v-icon class="mx-4">
+              mdi-bell
+            </v-icon>
+          </v-tab>
+          <v-tab :to="localePath({name:'push-registrations'})">
+            Appareils
+            <v-icon class="mx-4">
+              mdi-devices
+            </v-icon>
+          </v-tab>
+        </v-tabs>
+      </v-toolbar-items>
+      <v-spacer />
+      <personal-menu>
+        <template
+          v-if="user.adminMode"
+          #actions-before="{}"
+        >
+          <v-subheader>Administration</v-subheader>
+          <v-list-item to="/admin/global-topics">
+            <v-list-item-title>Sujets globaux</v-list-item-title>
+          </v-list-item>
+          <v-divider />
+        </template>
+      </personal-menu>
+      <lang-switcher class="ml-2" />
     </v-app-bar>
 
     <v-main>
@@ -169,11 +112,12 @@
 
 <script>
 import Notifications from '../components/notifications.vue'
-import langSwitcher from '../components/lang-switcher.vue'
+import PersonalMenu from '@data-fair/sd-vue/src/vuetify/personal-menu.vue'
+import LangSwitcher from '@data-fair/sd-vue/src/vuetify/lang-switcher.vue'
 import { mapState, mapGetters } from 'vuex'
 
 export default {
-  components: { Notifications, langSwitcher },
+  components: { Notifications, PersonalMenu, LangSwitcher },
   data () {
     return {
       uptimeUrl: process.env.uptimeUrl
@@ -198,7 +142,15 @@ export default {
 </script>
 
 <style>
-.v-app-bar .logo-container img {
-  height:68px;
+.v-app-bar .logo-container {
+  height: 100%;
+  padding: 4px;
+  margin-left: 4px !important;
+  margin-right: 4px;
+  width: 64px;
+}
+
+body .v-application .logo-container img, body .v-application .logo-container svg {
+  height:100%;
 }
 </style>

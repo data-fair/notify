@@ -11,7 +11,7 @@ exports.query = (req, fieldsMap = {}) => {
   })
 
   const showAll = req.query.showAll === 'true'
-  if (showAll && !req.user.isAdmin) throw createError(400, 'Only super admins can override permissions filter with showAll parameter')
+  if (showAll && !req.user.adminMode) throw createError(400, 'Only super admins can override permissions filter with showAll parameter')
 
   // WARNING: Important filter that preserves clients separation
   if (!showAll) {

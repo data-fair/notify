@@ -14,7 +14,7 @@ router.get('', auth(), asyncWrap(async (req, res, next) => {
   // not sort, project or filter here
   // we need to build a tree with results, simpler to always return everything for now
   let filter
-  if (req.query.global === 'true' && !req.user.isAdmin) return res.status(403).send()
+  if (req.query.global === 'true' && !req.user.adminMode) return res.status(403).send()
   if (req.query.global) {
     filter = { 'owner.id': '*' }
   } else {
@@ -33,7 +33,7 @@ router.post('', asyncWrap(async (req, res, next) => {
   } else {
     await auth(false)(req, res, () => {})
     if (!req.user) return res.status(401).send()
-    if (!req.user.isAdmin || !req.body.owner) {
+    if (!req.user.adminMode || !req.body.owner) {
       if (req.activeAccountRole !== 'admin') return res.status(403).send()
       req.body.owner = req.activeAccount
     }
@@ -57,8 +57,8 @@ router.delete('/:id', asyncWrap(async (req, res, next) => {
   } else {
     await auth(false)(req, res, () => {})
     if (!req.user) return res.status(401).send()
-    if (!req.user.isAdmin && req.activeAccountRole !== 'admin') return res.status(403).send()
-    if (!req.user.isAdmin) {
+    if (!req.user.adminMode && req.activeAccountRole !== 'admin') return res.status(403).send()
+    if (!req.user.adminMode) {
       idFilter['owner.type'] = req.activeAccount.type
       idFilter['owner.id'] = req.activeAccount.id
     }

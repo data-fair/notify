@@ -63,7 +63,7 @@ exports.start = async ({ server, db, session }) => {
         }
         if (message.type === 'subscribe') {
           const [ownerType, ownerId] = message.channel.split(':')
-          if (!req.user.isAdmin) {
+          if (!req.user.adminMode) {
             if (ownerType === 'user' && ownerId !== req.user.id) {
               return ws.send(JSON.stringify({ type: 'error', data: 'subscription not allowed' }))
             }
