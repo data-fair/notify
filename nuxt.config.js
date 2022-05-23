@@ -60,6 +60,7 @@ module.exports = {
   plugins: [
     { src: '~plugins/iframe-resize' },
     { src: '~plugins/session' },
+    { src: '~plugins/vuetify' },
     { src: '~plugins/ws' },
     { src: '~plugins/dayjs' },
     { src: '~plugins/localized' }
