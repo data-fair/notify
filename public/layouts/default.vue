@@ -74,7 +74,7 @@
           <v-divider />
         </template>
       </personal-menu>
-      <lang-switcher class="ml-2" />
+      <lang-switcher />
     </v-app-bar>
 
     <v-main>

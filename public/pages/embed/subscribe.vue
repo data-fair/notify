@@ -18,13 +18,13 @@
           @register="refresh"
         />
       </v-row>
-      <v-row>
+      <v-row v-if="header">
         <v-col>
           <v-subheader
             class="px-0"
             style="height: auto;"
           >
-            {{ $tc('notifyMe', topics.length) }}
+            {{ header }}
           </v-subheader>
         </v-col>
       </v-row>
@@ -77,6 +77,10 @@ export default {
     sender () {
       if (!this.$route.query.sender) return null
       return parseSender(this.$route.query.sender)
+    },
+    header () {
+      if (this.$route.query.header === 'no') return ''
+      return this.$route.query.header || this.$tc('notifyMe', this.topics.length)
     }
   },
   mounted () {
