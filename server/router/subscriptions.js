@@ -102,6 +102,16 @@ router.post('', asyncWrap(async (req, res, next) => {
   res.status(200).json(req.body)
 }))
 
+router.get('/:id', asyncWrap(async (req, res, next) => {
+  const subscription = await req.app.get('db').collection('subscriptions').findOne({ _id: req.params.id })
+  if (!subscription) return res.status(404).send()
+  // both the sender and the recipient can create/modify a subscription
+  if (!req.user.adminMode && subscription.recipient.id !== req.user.id) {
+    return res.status(403).send('Impossible de lire un abonnement pour un autre utilisateur')
+  }
+  res.send(subscription)
+}))
+
 router.delete('/:id', asyncWrap(async (req, res, next) => {
   const subscription = await req.app.get('db').collection('subscriptions').findOne({ _id: req.params.id })
   if (!subscription) return res.status(204).send()
