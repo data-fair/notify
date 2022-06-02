@@ -51,6 +51,8 @@
 <i18n lang="yaml">
 fr:
   notifyMe: " | Me notifier de cet évènement : | Me notifier de ces évènements :"
+en:
+  notifyMe: " | Send me notifications for this event : | Send me notifications for these events :"
 </i18n>
 
 <script>

@@ -28,7 +28,7 @@
             <v-list>
               <v-list-item dense>
                 <v-list-item-content v-if="sub.sender">
-                  <span><strong>Émetteur : </strong> {{ sub.sender ? sub.sender.name : 'global' }}</span>
+                  <span><strong>Émetteur : </strong> {{ senderLabel(sub.sender) }}</span>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item dense>
@@ -136,6 +136,13 @@ export default {
     async remove (subscription) {
       await this.$axios.$delete('api/v1/subscriptions/' + subscription._id)
       this.refresh()
+    },
+    senderLabel (sender) {
+      if (!sender) return 'global'
+      let label = sender.name || sender.id
+      if (sender.department) label += ' / ' + sender.department
+      if (sender.role) label += ' / ' + sender.role
+      return label
     }
   }
 }
