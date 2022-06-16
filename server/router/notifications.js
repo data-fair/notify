@@ -9,6 +9,7 @@ const asyncWrap = require('../utils/async-wrap')
 const findUtils = require('../utils/find')
 const auth = require('../utils/auth')
 const { createWebhook } = require('../utils/webhooks')
+const prometheus = require('../utils/prometheus')
 const urlTemplate = require('url-template')
 const debug = require('debug')('notifications')
 const router = express.Router()
@@ -83,7 +84,10 @@ const sendNotification = async (req, notification) => {
   req.app.get('publishWS')([`user:${notification.recipient.id}:notifications`], notification)
   if (notification.outputs && notification.outputs.includes('devices')) {
     debug('Send notif to devices')
-    req.app.get('push')(notification).catch(err => console.error('Failed to send push notification', err))
+    req.app.get('push')(notification).catch(err => {
+      console.error('(notif-push) failed to send push notification', err)
+      prometheus.internalError.inc({ errorCode: 'notif-push' })
+    })
   }
   if (notification.outputs && notification.outputs.includes('email')) {
     global.events.emit('sentNotification', { output: 'email', notification })
@@ -101,8 +105,10 @@ const sendNotification = async (req, notification) => {
       html: notification.htmlBody || simpleHtml
     }
     debug('Send mail notif', notification.recipient, mail, notification)
+    prometheus.sentNotifications.inc({ output: 'mail' })
     axios.post(DIRECTORY_URL + '/api/mails', mail, { params: { key: config.secretKeys.sendMails } }).catch(err => {
-      console.error('Failed to send mail', err)
+      console.error('(notif-mail) failed to send mail', err)
+      prometheus.internalError.inc({ errorCode: 'notif-mail' })
     })
   }
 }
@@ -123,6 +129,7 @@ router.post('', asyncWrap(async (req, res, next) => {
       return res.status(403).send()
     }
   }
+  prometheus.receivedNotifications.inc()
 
   notification.visibility = notification.visibility ?? 'private'
   notification.date = new Date().toISOString()

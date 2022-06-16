@@ -4,5 +4,8 @@ module.exports = {
     identities: 'identities-secret',
     notifications: 'notifications-secret',
     sendMails: 'sendmails-secret'
+  },
+  prometheus: {
+    port: 9092
   }
 }

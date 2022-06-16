@@ -14,6 +14,7 @@ const status = require('./status')
 const ws = require('./ws')
 const webhooksWorker = require('./webhooks-worker')
 const auth = require('./utils/auth')
+const prometheus = require('./utils/prometheus')
 
 // a global event emitter for testing
 global.events = new EventEmitter()
@@ -62,7 +63,10 @@ app.get('/api/v1/admin/info', auth(true), (req, res) => {
 // Error management
 app.use((err, req, res, next) => {
   const status = err.statusCode || err.status || 500
-  if (status === 500) console.error('Error in express route', err)
+  if (status === 500) {
+    console.error('(http) error in express route', err)
+    prometheus.internalError.inc({ errorCode: 'http' })
+  }
   res.set('Cache-Control', 'no-cache')
   res.set('Expires', '-1')
   res.status(status).send(err.message)
@@ -78,11 +82,13 @@ exports.start = async () => {
   app.set('db', db)
   app.set('client', client)
   app.set('push', await require('./utils/push').init(db))
+  if (config.prometheus.active) await prometheus.start(db)
   server.listen(config.port)
   await eventToPromise(server, 'listening')
   wss = await ws.start({ server, db, session })
   webhooksWorker.start(db)
   app.set('publishWS', await ws.initPublisher(db))
+
   console.log(`HTTP and WebSocket server listening on ${config.port}, available at ${config.publicUrl}`)
 }
 
@@ -90,6 +96,11 @@ exports.stop = async () => {
   await webhooksWorker.stop()
   if (wss) ws.stop(wss)
   server.close()
+
+  if (config.mode !== 'task' && config.prometheus.active) {
+    await prometheus.stop()
+  }
+
   await eventToPromise(server, 'close')
   if (app.get('client')) await app.get('client').close()
 }

@@ -78,8 +78,8 @@
     "vuetify": "^2.6.0"
   },
   "dependencies": {
-    "@koumoul/nuxt-config-inject": "^0.4.2",
     "@data-fair/sd-express": "1.2.0",
+    "@koumoul/nuxt-config-inject": "^0.4.2",
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/i18n": "^7.2.0",
     "accept-language-parser": "^1.5.0",
@@ -103,6 +103,7 @@
     "node-pushnotifications": "^1.2.0",
     "nodemon": "^1.19.4",
     "nuxt-start": "^2.15.8",
+    "prom-client": "^14.0.1",
     "semver-extract": "^1.1.1",
     "url-template": "^2.0.8",
     "useragent": "^2.3.0",

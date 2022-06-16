@@ -8,6 +8,7 @@ const PushNotifications = require('node-pushnotifications')
 const useragent = require('useragent')
 const dayjs = require('dayjs')
 const asyncWrap = require('./async-wrap')
+const prometheus = require('./prometheus')
 const debug = require('debug')('notifications')
 
 fs.ensureDirSync('./security')
@@ -51,6 +52,7 @@ exports.init = async (db) => {
         if (registration.disabledUntil > dayjs().toISOString()) continue
         delete registration.disabledUntil
       }
+      prometheus.sentNotifications.inc({ output: 'device-' + registration.type })
 
       const pushNotif = {
         ...notification,
@@ -62,6 +64,7 @@ exports.init = async (db) => {
       debug('Send push notif', notification.recipient.id, registration, pushNotif, res[0])
       const error = res[0].message.filter(m => !!m.error)[0]
       if (error) {
+        prometheus.pushDeviceErrors.inc({ output: 'device-' + registration.type, statusCode: error.error?.statusCode })
         errors.push(error)
         if (error.error && error.error.statusCode === 410) {
           console.log('registration has unsubscribed or expired, disable it', error.error.body || error.error.response || error.error.statusCode, JSON.stringify(registration))

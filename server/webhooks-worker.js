@@ -1,6 +1,7 @@
 const config = require('config')
 const dayjs = require('dayjs')
 const axios = require('./utils/axios')
+const prometheus = require('./utils/prometheus')
 const debug = require('debug')('webhooks-worker')
 
 let loopPromise, stopped
@@ -64,7 +65,7 @@ const loop = async (db) => {
         $inc: { nbAttempts: 1 }
       }
       if (webhook.nbAttempts >= 9) {
-        debug('webhook failed 10 times, no more attemps')
+        debug('webhook failed 10 times, no more attempts')
         patch.$unset = { nextAttempt: '' }
       } else {
         patch.$set.nextAttempt = dayjs().add(Math.ceil(Math.pow(webhook.nbAttempts + 1, 2.5)), 'minute').toDate()
@@ -84,6 +85,7 @@ exports.stop = async () => {
   try {
     await loopPromise
   } catch (err) {
-    console.error('failure when waiting for loop promise finish')
+    console.error('(webhooks-loop) failure when waiting for loop promise finish', err)
+    prometheus.internalError.inc({ errorCode: 'webhooks-loop' })
   }
 }

@@ -46,5 +46,9 @@ module.exports = {
   proxyNuxt: false,
   worker: {
     loopInterval: 4000
+  },
+  prometheus: {
+    active: true,
+    port: 9090
   }
 }
