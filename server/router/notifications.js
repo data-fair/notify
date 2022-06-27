@@ -32,14 +32,16 @@ router.get('', auth(), asyncWrap(async (req, res, next) => {
     pointer = await db.collection('pointers').findOne({ 'recipient.id': req.user.id })
     resultsPromise = new Promise(resolve => resolve([]))
   }
+  const countNewPromise = pointer ? notifications.countDocuments({ ...query, date: { $gt: pointer.date } }) : await notifications.countDocuments(query)
 
-  const countPromise = notifications.countDocuments(query)
-  const countNewPromise = pointer ? notifications.countDocuments({ ...query, date: { $gt: pointer.date } }) : countPromise
-  const [results, count, countNew] = await Promise.all([resultsPromise, countPromise, countNewPromise])
-  results.forEach(notif => {
+  const response = {}
+  if (req.query.count !== 'false') response.count = await notifications.countDocuments(query)
+  response.countNew = await countNewPromise
+  response.results = await resultsPromise
+  response.results.forEach(notif => {
     if (!pointer || notif.date > pointer.date) notif.new = true
   })
-  res.json({ results, count, countNew })
+  res.json(response)
 }))
 
 const localizeProp = (prop, locale) => {
