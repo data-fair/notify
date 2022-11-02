@@ -54,7 +54,7 @@ module.exports = (locales, noSingleLocale = false) => {
       // sender is the owner of the topic
       sender,
       topic: topicRef,
-      // it will be the recipient of the matched subscription
+      // it will be the recipient of the matched subscription, or explicitly defined without requiring a subscription
       recipient,
       outputs: {
         type: 'array',
