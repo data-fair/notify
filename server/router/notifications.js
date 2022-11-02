@@ -168,7 +168,7 @@ router.post('', asyncWrap(async (req, res, next) => {
 
   // if the notification was directly targetted to the user, no need for a subscription
   // the subscription might still have been used to customize locale, outputs, etc.. but it is not required
-  if (notification.recipient && !nbSent) {
+  if (notification.recipient && !nbSent && req.query.subscribedOnly !== 'true') {
     await sendNotification(req, notification)
   }
 
