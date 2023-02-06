@@ -5,6 +5,7 @@ const config = require('config')
 const cookieParser = require('cookie-parser')
 const eventToPromise = require('event-to-promise')
 const http = require('http')
+const { createHttpTerminator } = require('http-terminator')
 const cors = require('cors')
 const session = require('@data-fair/sd-express')({
   directoryUrl: config.directoryUrl,
@@ -23,6 +24,7 @@ const app = express()
 app.set('json spaces', 2)
 app.set('session', session)
 const server = http.createServer(app)
+const httpTerminator = createHttpTerminator({ server })
 
 // cf https://connectreport.com/blog/tuning-http-keep-alive-in-node-js/
 // timeout is often 60s on the reverse proxy, better to a have a longer one here
@@ -101,12 +103,9 @@ exports.start = async () => {
 exports.stop = async () => {
   await webhooksWorker.stop()
   if (wss) ws.stop(wss)
-  server.close()
-
+  await httpTerminator.terminate()
   if (config.mode !== 'task' && config.prometheus.active) {
     await prometheus.stop()
   }
-
-  await eventToPromise(server, 'close')
   if (app.get('client')) await app.get('client').close()
 }
