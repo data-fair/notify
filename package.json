@@ -75,7 +75,7 @@
     "nuxt": "^2.15.8",
     "reconnecting-websocket": "^4.2.0",
     "vue-moment": "^4.1.0",
-    "vuetify": "^2.6.0"
+    "vuetify": "^2.6.10"
   },
   "dependencies": {
     "@data-fair/sd-express": "1.4.0",
