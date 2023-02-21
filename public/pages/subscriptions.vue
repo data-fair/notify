@@ -140,7 +140,7 @@ export default {
     senderLabel (sender) {
       if (!sender) return 'global'
       let label = sender.name || sender.id
-      if (sender.department) label += ' / ' + sender.department
+      if (sender.department) label += ' / ' + (sender.departmentName || sender.department)
       if (sender.role) label += ' / ' + sender.role
       return label
     }

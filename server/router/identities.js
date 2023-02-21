@@ -14,7 +14,12 @@ router.use((req, res, next) => {
 
 // notify a name change or initialization
 router.post('/:type/:id', asyncWrap(async (req, res) => {
-  const identity = { ...req.params, name: req.body.name, organizations: req.body.organizations }
+  const identity = {
+    ...req.params,
+    name: req.body.name,
+    organizations: req.body.organizations,
+    departments: req.body.departments
+  }
   const db = req.app.get('db')
   if (identity.type === 'user') {
     await db.collection('notifications').updateMany({ 'recipient.id': identity.id }, { $set: { 'recipient.name': identity.name } })
@@ -25,39 +30,36 @@ router.post('/:type/:id', asyncWrap(async (req, res) => {
   await db.collection('pushSubscriptions').updateMany({ 'owner.type': identity.type, 'owner.id': identity.id }, { $set: { 'owner.name': identity.name } })
   await db.collection('webhook-subscriptions').updateMany({ 'sender.type': identity.type, 'sender.id': identity.id }, { $set: { 'sender.name': identity.name } })
   await db.collection('webhook-subscriptions').updateMany({ 'owner.type': identity.type, 'owner.id': identity.id }, { $set: { 'owner.name': identity.name } })
-
-  if (identity.type === 'user' && identity.organizations) {
-    // remove private subscriptions if user left the organization
-    await db.collection('subscriptions').deleteMany({
-      'recipient.id': identity.id,
-      visibility: { $ne: 'public' },
-      'sender.type': 'organization',
-      'sender.id': { $nin: identity.organizations.map(o => o.id) }
-    })
-    // remove private subscriptions if user changed department
-    for (const org of identity.organizations) {
-      if (org.department) {
-        await db.collection('subscriptions').deleteMany({
-          'recipient.id': identity.id,
-          visibility: { $ne: 'public' },
-          'sender.type': 'organization',
-          'sender.id': org.id,
-          'sender.department': { $ne: org.department }
-        })
-      }
-    }
-    // remove private subscriptions if user changed role
-    for (const org of identity.organizations) {
-      await db.collection('subscriptions').deleteMany({
-        'recipient.id': identity.id,
-        visibility: { $ne: 'public' },
-        'sender.type': 'organization',
-        'sender.id': org.id,
-        $and: [{ 'sender.role': { $ne: org.role } }, { 'sender.role': { $exists: true } }]
-      })
+  if (identity.departments) {
+    for (const department of req.body.departments.filter(d => !!d.name)) {
+      await db.collection('subscriptions').updateMany({ 'sender.type': identity.type, 'sender.id': identity.id, 'sender.department': identity.department }, { $set: { 'sender.name': identity.name, 'sender.departmentName': department.name } })
+      await db.collection('topics').updateMany({ 'owner.type': identity.type, 'owner.id': identity.id, 'owner.department': identity.department }, { $set: { 'owner.name': identity.name, 'owner.departmentName': department.name } })
+      await db.collection('pushSubscriptions').updateMany({ 'owner.type': identity.type, 'owner.id': identity.id, 'owner.department': identity.department }, { $set: { 'owner.name': identity.name, 'owner.departmentName': department.name } })
+      await db.collection('webhook-subscriptions').updateMany({ 'sender.type': identity.type, 'sender.id': identity.id, 'sender.department': identity.department }, { $set: { 'sender.name': identity.name, 'sender.departmentName': department.name } })
+      await db.collection('webhook-subscriptions').updateMany({ 'owner.type': identity.type, 'owner.id': identity.id, 'owner.department': identity.department }, { $set: { 'owner.name': identity.name, 'owner.departmentName': department.name } })
     }
   }
 
+  if (identity.type === 'user' && identity.organizations) {
+    const privateSubscriptionFilter = {
+      'recipient.id': identity.id,
+      visibility: { $ne: 'public' },
+      'sender.type': 'organization'
+    }
+    for await (const privateSubscription of db.collection('subscriptions').find(privateSubscriptionFilter)) {
+      let userOrg = identity.organizations.find(o => o.id === privateSubscription.sender.id && !o.department)
+      if (privateSubscription.sender.department) {
+        userOrg = userOrg || identity.organizations.find(o => o.id === privateSubscription.sender.id && o.department === privateSubscription.sender.department)
+      }
+      if (privateSubscription.sender.role && userOrg.role !== privateSubscription.sender.role && userOrg.role !== 'admin') {
+        userOrg = null
+      }
+      if (!userOrg) {
+        console.log('remove private subscription that does not match user orgs anymore', identity, privateSubscription)
+        await db.collection('subscriptions').deleteOne({ _id: privateSubscription._id })
+      }
+    }
+  }
   res.send()
 }))
 
