@@ -18,7 +18,7 @@ router.get('', auth(), asyncWrap(async (req, res, next) => {
   if (req.query.global) {
     filter = { 'owner.id': '*' }
   } else {
-    filter = { 'owner.type': req.activeAccount.type, 'owner.id': { $in: [req.activeAccount.id, '*'] } }
+    filter = { 'owner.type': req.user.accountOwner.type, 'owner.id': { $in: [req.user.accountOwner.id, '*'] } }
   }
   const results = await req.app.get('db').collection('topics')
     .find(filter).limit(10000).toArray()
@@ -34,14 +34,14 @@ router.post('', asyncWrap(async (req, res, next) => {
     await auth(false)(req, res, () => {})
     if (!req.user) return res.status(401).send()
     if (!req.user.adminMode || !req.body.owner) {
-      if (req.activeAccountRole !== 'admin') return res.status(403).send()
-      req.body.owner = req.activeAccount
+      if (req.user.accountOwnerRole !== 'admin') return res.status(403).send()
+      req.body.owner = req.user.accountOwner
     }
   }
 
   const valid = validate(req.body)
   if (!valid) return res.status(400).send(validate.errors)
-  const idFilter = { 'owner.type': req.activeAccount.type, 'owner.id': req.activeAccount.id, key: req.body.key }
+  const idFilter = { 'owner.type': req.user.accountOwner.type, 'owner.id': req.user.accountOwner.id, key: req.body.key }
   const existingTopic = await db.collection('topics').findOne(idFilter)
   req.body.updated = { id: req.user.id, name: req.user.name, date: new Date() }
   req.body.created = existingTopic ? existingTopic.created : req.body.updated
@@ -57,10 +57,10 @@ router.delete('/:id', asyncWrap(async (req, res, next) => {
   } else {
     await auth(false)(req, res, () => {})
     if (!req.user) return res.status(401).send()
-    if (!req.user.adminMode && req.activeAccountRole !== 'admin') return res.status(403).send()
+    if (!req.user.adminMode && req.user.accountOwnerRole !== 'admin') return res.status(403).send()
     if (!req.user.adminMode) {
-      idFilter['owner.type'] = req.activeAccount.type
-      idFilter['owner.id'] = req.activeAccount.id
+      idFilter['owner.type'] = req.user.accountOwner.type
+      idFilter['owner.id'] = req.user.accountOwner.id
     }
   }
   await req.app.get('db').collection('topics').deleteOne(idFilter)

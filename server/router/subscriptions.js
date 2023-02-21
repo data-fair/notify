@@ -55,10 +55,12 @@ const canSubscribePrivate = (sender, user) => {
   if (sender.type === 'user') return sender.id === user.id
 
   if (sender.type === 'organization') {
-    const userOrg = user.organizations.find(o => o.id === sender.id)
+    let userOrg = user.organizations.find(o => o.id === sender.id && !o.department)
+    if (sender.department) {
+      userOrg = user.organizations.find(o => o.id === sender.id && o.department === sender.department) || userOrg
+    }
     if (!userOrg) return false
-    if (userOrg.department && userOrg.department !== sender.department) return false
-    if (sender.role && sender.role !== userOrg.role) return false
+    if (sender.role && sender.role !== userOrg.role && userOrg.role !== 'admin') return false
     return true
   }
 }

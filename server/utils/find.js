@@ -15,8 +15,8 @@ exports.query = (req, fieldsMap = {}) => {
 
   // WARNING: Important filter that preserves clients separation
   if (!showAll) {
-    query['owner.type'] = req.activeAccount.type
-    query['owner.id'] = req.activeAccount.id
+    query['owner.type'] = req.user.accountOwner.type
+    query['owner.id'] = req.user.accountOwner.id
   }
   return query
 }

@@ -125,7 +125,7 @@ router.post('', asyncWrap(async (req, res, next) => {
   } else {
     await auth(false)(req, res, () => {})
     if (!req.user) return res.status(401).send()
-    notification.sender = req.activeAccount
+    notification.sender = req.user.accountOwner
     notification.recipient = notification.recipient || { id: req.user.id, name: req.user.name }
     if (!req.user.adminMode && (!notification.recipient || notification.recipient.id !== req.user.id)) {
       return res.status(403).send()
