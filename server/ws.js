@@ -23,7 +23,7 @@ let stopped = false
 exports.stop = async (wss) => {
   stopped = true
   wss.close()
-  if (cursor) cursor.close()
+  // if (cursor) cursor.close()
 }
 
 async function channel (db) {
