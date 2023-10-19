@@ -28,6 +28,7 @@ jobs:
       run: npm run quality
 
   build:
+    needs: quality
     runs-on: ubuntu-latest
     steps:
     - name: Checkout git repository
