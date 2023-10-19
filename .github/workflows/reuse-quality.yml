@@ -1,6 +1,5 @@
 name: Quality checks
 
-# this makes it a reusable workflow
 on:
   workflow_call:
 
