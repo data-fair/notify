@@ -1,32 +1,10 @@
 name: Build CI
 
+# this makes it a reusable workflow
 on:
-  push:
-    branches: [ '*' ]
-    tags: [ 'v*.*.*' ]
+  workflow_call:
 
 jobs:
-  quality:
-    # no need to run this on every small commit, husky already did it on the dev computer
-    # if: ${{ github.ref_type == 'tag' || github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout git repository
-      uses: actions/checkout@v4
-    
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 20
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-
-    # no need to work on a cache here, it is not faster than pulling
-    # instead work on moving to some images hosted on ghcr.io, it is the fastest
-    - name: Run quality checks
-      run: npm run quality
-
   build:
     needs: quality
     runs-on: ubuntu-latest

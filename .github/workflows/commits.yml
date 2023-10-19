@@ -1,0 +1,13 @@
+# no need to run quality checks on every small commit, husky already did it on the dev computer
+# in this case we simply build the docker image
+
+name: Build simple commit
+
+on:
+  push:
+    branches: ['*']
+    tags-ignore: [ 'v*.*.*' ]
+
+jobs:
+  build:
+    uses: ./.github/workflows/reuse-build.yml

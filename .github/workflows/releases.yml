@@ -1,0 +1,15 @@
+# for releases we run in sequence the qualityt checks and the build
+
+name: Build release
+
+on:
+  push:
+    tags: [ 'v*.*.*' ]
+
+jobs:
+  quality:
+    uses: ./.github/workflows/reuse-quality.yml
+
+  build:
+    needs: quality
+    uses: ./.github/workflows/reuse-build.yml
