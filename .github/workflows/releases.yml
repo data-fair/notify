@@ -13,3 +13,10 @@ jobs:
   build:
     needs: quality
     uses: ./.github/workflows/reuse-build.yml
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:    
+    - name: Send Keel notification to koumoul.com
+      run: |
+        curl -s --fail --show-error -X POST https://keel.admin.koumoul.com/v1/webhooks/native -u ${{ secrets.KEEL_PROD_USER }}:${{ secrets.KEEL_PROD_PASSWORD }} -d '{"name": "ghcr.io/${{ github.repository }}", "tag": "${{ github.ref_name }}"}'
