@@ -6,6 +6,8 @@ services:
       - test
     image: koumoul/simple-directory:master
     network_mode: host
+    depends_on:
+      - mongo
     environment:
       - DEBUG=webhooks
       - ADMINS=["superadmin@test.com"]

@@ -4,18 +4,20 @@
   "description": "A simple server to manage notifications feeds for our users. Notifications are stored and pushed to various channels.",
   "main": "index.js",
   "scripts": {
-    "dev-deps": "docker-compose --profile dev up -d",
+    "dev-deps": "docker compose --profile dev up -d",
     "stop-dev-deps": "docker compose --profile dev stop",
     "dev-server": "NODE_ENV=development nodemon server",
     "dev-client": "NODE_ENV=development nuxt",
     "build": "nuxt build",
     "lint": "eslint --ext js,vue --ignore-path .gitignore .",
     "lint-fix": "eslint --fix --ext js,vue --ignore-path .gitignore .",
-    "test-deps": "docker-compose --profile test up -d",
-    "test": "NODE_ENV=test mocha --exit --timeout 10000"
+    "test-deps": "docker compose --profile test up -d --wait",
+    "test": "NODE_ENV=test mocha --exit --timeout 10000",
+    "quality": "npm run lint && npm run test-deps && npm run test && npm audit --omit=dev --audit-level=critical",
+    "prepare": "husky install"
   },
   "engines": {
-    "node": "v16"
+    "node": "v20"
   },
   "repository": {
     "type": "git",
@@ -71,6 +73,7 @@
     "eslint-plugin-promise": "^5.1.1",
     "eslint-plugin-vue": "^8.5.0",
     "http-proxy-middleware": "^1.0.6",
+    "husky": "^8.0.3",
     "iframe-resizer": "^4.2.3",
     "mocha": "^6.2.2",
     "nuxt": "^2.15.8",
@@ -79,6 +82,8 @@
     "vuetify": "^2.6.0"
   },
   "dependencies": {
+    "@commitlint/cli": "^17.8.0",
+    "@commitlint/config-conventional": "^17.8.0",
     "@data-fair/sd-express": "1.4.3",
     "@koumoul/nuxt-config-inject": "^0.4.2",
     "@nuxtjs/axios": "^5.13.6",

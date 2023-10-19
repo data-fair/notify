@@ -38,5 +38,5 @@ npm run test
 Test building the docker image:
 
 ```
-docker build --network=host -t notify-dev .
+docker build -t notify-dev .
 ```
