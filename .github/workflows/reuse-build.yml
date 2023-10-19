@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-    needs: quality
     runs-on: ubuntu-latest
     steps:
     - name: Checkout git repository
