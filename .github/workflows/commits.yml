@@ -13,6 +13,7 @@ jobs:
     uses: ./.github/workflows/reuse-build.yml
 
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - name: Send Keel notification to staging-koumoul.com
