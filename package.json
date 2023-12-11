@@ -58,6 +58,8 @@
   },
   "homepage": "https://github.com/koumoul-dev/notify#readme",
   "devDependencies": {
+    "@commitlint/cli": "^17.8.0",
+    "@commitlint/config-conventional": "^17.8.0",
     "@data-fair/sd-vue": "2.6.1",
     "@koumoul/vjsf": "^2.11.3",
     "@mdi/font": "^6.6.95",
@@ -82,8 +84,6 @@
     "vuetify": "^2.6.0"
   },
   "dependencies": {
-    "@commitlint/cli": "^17.8.0",
-    "@commitlint/config-conventional": "^17.8.0",
     "@data-fair/sd-express": "1.4.3",
     "@koumoul/nuxt-config-inject": "^0.4.2",
     "@nuxtjs/axios": "^5.13.6",
