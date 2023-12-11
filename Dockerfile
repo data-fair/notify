@@ -1,6 +1,6 @@
 ######################################
 # Stage: nodejs dependencies and build
-FROM node:20.8.1-alpine3.18 AS builder
+FROM node:20.10.0-alpine3.18 AS builder
 
 WORKDIR /webapp
 ADD package.json .
@@ -29,7 +29,7 @@ RUN npm prune --production && rm -rf node_modules/.cache
 
 ##################################
 # Stage: main nodejs service stage
-FROM node:20.8.1-alpine3.18
+FROM node:20.10.0-alpine3.18
 MAINTAINER "contact@koumoul.com"
 
 RUN apk add --no-cache dumb-init
