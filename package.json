@@ -13,7 +13,7 @@
     "lint-fix": "eslint --fix --ext js,vue --ignore-path .gitignore .",
     "test-deps": "docker compose --profile test up -d --wait --quiet-pull",
     "test": "NODE_ENV=test mocha --exit --timeout 10000",
-    "quality": "npm run test-deps && npm run lint && docker compose logs sd && npm run test && npm audit --omit=dev --audit-level=critical",
+    "quality": "npm run test-deps && npm run lint && npm run test && npm audit --omit=dev --audit-level=critical",
     "prepare": "husky install"
   },
   "engines": {
