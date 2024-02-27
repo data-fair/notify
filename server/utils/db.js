@@ -23,13 +23,13 @@ exports.ensureIndex = async (db, collection, key, options = {}) => {
 }
 
 exports.connect = async () => {
-  const client = await MongoClient.connect(config.mongoUrl)
+  const client = await MongoClient.connect(config.mongo.url, config.mongo.options)
   const db = client.db()
   return { db, client }
 }
 
 exports.init = async () => {
-  console.log('Connecting to mongodb ' + config.mongoUrl)
+  console.log('Connecting to mongodb')
   const { db, client } = await exports.connect()
   await exports.ensureIndex(db, 'topics', { 'owner.type': 1, 'owner.id': 1, key: 1 }, { name: 'main-keys', unique: true })
   await exports.ensureIndex(db, 'subscriptions', { 'sender.type': 1, 'sender.id': 1, 'sender.department': 1, 'sender.role': 1, 'recipient.id': 1, 'topic.key': 1 }, { name: 'main-keys', unique: true })

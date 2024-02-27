@@ -3,7 +3,13 @@ module.exports = {
   publicUrl: 'PUBLIC_URL',
   directoryUrl: 'DIRECTORY_URL',
   privateDirectoryUrl: 'PRIVATE_DIRECTORY_URL',
-  mongoUrl: 'MONGO_URL',
+  mongo: {
+    url: 'MONGO_URL',
+    options: {
+      __name: 'MONGO_OPTIONS',
+      __format: 'json'
+    }
+  },
   secretKeys: {
     identities: 'SECRET_IDENTITIES',
     notifications: 'SECRET_NOTIFICATIONS',

@@ -3,7 +3,10 @@ module.exports = {
   publicUrl: 'http://localhost:5994',
   directoryUrl: 'http://localhost:5994/simple-directory',
   privateDirectoryUrl: null,
-  mongoUrl: 'mongodb://localhost:27017/notify-' + (process.env.NODE_ENV || 'development'),
+  mongo: {
+    url: 'mongodb://localhost:27017/notify-' + (process.env.NODE_ENV || 'development'),
+    options: {}
+  },
   // secrets that can be used to configure global webhooks for example to update users and organizations
   secretKeys: {
     identities: null,
