@@ -88,7 +88,22 @@ exports.start = async () => {
   const nuxt = await require('./nuxt')()
   app.use(cors(), nuxt.render)
   const { db, client } = await require('./utils/db').init()
-  await require('../upgrade')(db)
+
+  const locks = await import('@data-fair/lib/node/locks/js')
+  await locks.init(db)
+
+  if (!await locks.acquire('upgrade')) {
+    console.warn('upgrade scripts lock is already acquired, skip them')
+    // IMPORTANT: this behaviour of running the worker when the upgrade scripts are still running implies
+    // that they cannot be considered as a pre-requisite.
+    // if we want to consider the upgrade scripts as a pre-requisite we should implement a wait on all
+    // containers for the scripts that are running in only 1 (while loop on "acquire" ?) and a healthcheck so that workers
+    // are not considered "up" and the previous versions keep running in the mean time
+  } else {
+    await require('../upgrade')(db)
+    await locks.release('upgrade')
+  }
+
   app.set('db', db)
   app.set('client', client)
   app.set('push', await require('./utils/push').init(db))
