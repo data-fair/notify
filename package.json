@@ -65,6 +65,7 @@
     "@mdi/font": "^6.6.95",
     "@nuxtjs/google-fonts": "^1.3.0",
     "@nuxtjs/vuetify": "^1.12.1",
+    "@types/debug": "^4.1.12",
     "babel-eslint": "^10.0.3",
     "clean-modules": "^2.0.4",
     "eslint": "^7.32.0",
@@ -78,12 +79,14 @@
     "husky": "^8.0.3",
     "iframe-resizer": "^4.2.3",
     "mocha": "^6.2.2",
-    "nuxt": "^2.15.8",
+    "nuxt": "^2.17.3",
     "reconnecting-websocket": "^4.2.0",
+    "typescript": "^5.4.3",
     "vue-moment": "^4.1.0",
     "vuetify": "^2.6.0"
   },
   "dependencies": {
+    "@data-fair/lib": "^0.30.0",
     "@data-fair/sd-express": "1.4.3",
     "@koumoul/nuxt-config-inject": "^0.4.2",
     "@nuxtjs/axios": "^5.13.6",
@@ -114,7 +117,7 @@
     "semver-extract": "^1.1.1",
     "url-template": "^2.0.8",
     "useragent": "^2.3.0",
-    "ws": "^7.2.0"
+    "ws": "^7.5.9"
   },
   "overrides": {
     "node-pushnotifications": {
@@ -126,7 +129,8 @@
       "vue-i18n": "8.28.2",
       "vue-router": "3.6.5",
       "mongodb": "$mongodb",
-      "prom-client": "$prom-client"
+      "prom-client": "$prom-client",
+      "ws": "7.5.9"
     }
   }
 }
