@@ -1,7 +1,7 @@
 const config = require('config')
 const express = require('express')
 const { nanoid } = require('nanoid')
-const ajv = require('ajv')()
+const ajv = require('../utils/ajv')
 const schema = require('../../contract/subscription')(config.i18n.locales.split(','))
 const validate = ajv.compile(schema)
 const asyncWrap = require('../utils/async-wrap')
