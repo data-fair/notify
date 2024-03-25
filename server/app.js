@@ -89,7 +89,7 @@ exports.start = async () => {
   app.use(cors(), nuxt.render)
   const { db, client } = await require('./utils/db').init()
 
-  const locks = await import('@data-fair/lib/node/locks/js')
+  const locks = await import('@data-fair/lib/node/locks.js')
   await locks.init(db)
 
   if (!await locks.acquire('upgrade')) {
