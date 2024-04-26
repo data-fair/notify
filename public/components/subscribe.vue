@@ -72,7 +72,7 @@ export default {
         recipient: this.user.id,
         topic: this.topic.key
       }
-      if (this.noSender) {
+      if (this.noSender || this.sender === 'none') {
         params.sender = 'none'
       } else if (this.sender) {
         params.sender = serializeSender(this.sender, true)
