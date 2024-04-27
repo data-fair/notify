@@ -77,7 +77,7 @@ export default {
       return keys.map((key, i) => ({ key, title: titles[i] }))
     },
     senders () {
-      return this.$route.query.sender ? this.$route.query.sender.split(',').map(parseSender) : []
+      return this.$route.query.sender ? this.$route.query.sender.split(',').map(s => s ? parseSender(s) : null) : []
     },
     header () {
       if (this.$route.query.header === 'no') return ''
