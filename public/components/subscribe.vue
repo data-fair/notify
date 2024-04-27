@@ -72,7 +72,7 @@ export default {
         recipient: this.user.id,
         topic: this.topic.key
       }
-      if (this.noSender) {
+      if (this.noSender || this.sender === 'none') {
         params.sender = 'none'
       } else if (this.sender) {
         params.sender = serializeSender(this.sender, true)
@@ -98,7 +98,7 @@ export default {
           outputs: [],
           locale: this.$i18n.locale
         }
-        if (!this.noSender) subscription.sender = this.sender || this.activeAccount
+        if (!this.noSender && this.sender !== 'none') subscription.sender = this.sender || this.activeAccount
         if (this.icon) subscription.icon = this.icon
         if (this.urlTemplate) subscription.urlTemplate = this.urlTemplate
         await this.sendSubscription(subscription)
