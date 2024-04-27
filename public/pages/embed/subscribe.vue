@@ -29,7 +29,7 @@
         </v-col>
       </v-row>
       <v-row
-        v-for="topic in topics"
+        v-for="(topic, i) in topics"
         :key="topic.key"
         class="ma-0"
       >
@@ -40,7 +40,7 @@
           :icon="$route.query.icon"
           :url-template="$route.query['url-template']"
           :outputs="outputs"
-          :sender="topic.sender"
+          :sender="senders[i] || null"
           @register="register = true"
         />
       </v-row>
@@ -74,8 +74,10 @@ export default {
     topics () {
       const keys = this.$route.query.key.split(',')
       const titles = this.$route.query.title.split(',')
-      const senders = this.$route.query.sender ? this.$route.query.sender.split(',').map(parseSender) : []
-      return keys.map((key, i) => ({ key, title: titles[i], sender: senders[i] || null }))
+      return keys.map((key, i) => ({ key, title: titles[i] }))
+    },
+    senders () {
+      return this.$route.query.sender ? this.$route.query.sender.split(',').map(parseSender) : []
     },
     header () {
       if (this.$route.query.header === 'no') return ''
