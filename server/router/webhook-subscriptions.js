@@ -1,6 +1,6 @@
 const express = require('express')
 const { nanoid } = require('nanoid')
-const ajv = require('ajv')()
+const ajv = require('../utils/ajv')
 const schema = require('../../contract/webhook-subscription')
 const validate = ajv.compile(schema)
 const asyncWrap = require('../utils/async-wrap')
