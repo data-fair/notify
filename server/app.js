@@ -7,6 +7,7 @@ const eventToPromise = require('event-to-promise')
 const http = require('http')
 const { createHttpTerminator } = require('http-terminator')
 const cors = require('cors')
+const CronJob = require('cron').CronJob
 const session = require('@data-fair/sd-express')({
   directoryUrl: config.directoryUrl,
   privateDirectoryUrl: config.privateDirectoryUrl
@@ -16,6 +17,7 @@ const ws = require('./ws')
 const webhooksWorker = require('./webhooks-worker')
 const auth = require('./utils/auth')
 const prometheus = require('./utils/prometheus')
+const emails = require('./utils/emails')
 
 // a global event emitter for testing
 global.events = new EventEmitter()
@@ -82,6 +84,9 @@ app.use((err, req, res, next) => {
   res.status(status).send(err.message)
 })
 
+/** @type {import('cron').CronJob | null} */
+let emailsGroupingJob
+
 // Run app and return it in a promise
 let wss
 exports.start = async () => {
@@ -104,6 +109,20 @@ exports.start = async () => {
     await locks.release('upgrade')
   }
 
+  // TODO: move this into a small worker
+  emailsGroupingJob = new CronJob(config.emailsGrouping.cron, async () => {
+    if (!await locks.acquire('emailsGrouping')) {
+      console.warn('emailsGrouping lock is already acquired, skip')
+    } else {
+      for await (const mailsItem of db.collection('mails').find({})) {
+        await emails.sendNotifications(mailsItem.notifications)
+      }
+      await db.collection('mails').deleteMany({})
+      await locks.release('emailsGrouping')
+    }
+  })
+  emailsGroupingJob.start()
+
   app.set('db', db)
   app.set('client', client)
   app.set('push', await require('./utils/push').init(db))
@@ -118,6 +137,7 @@ exports.start = async () => {
 }
 
 exports.stop = async () => {
+  if (emailsGroupingJob) emailsGroupingJob.stop()
   await webhooksWorker.stop()
   if (wss) ws.stop(wss)
   await httpTerminator.terminate()

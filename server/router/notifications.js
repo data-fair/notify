@@ -4,7 +4,6 @@ const config = require('config')
 const ajv = require('../utils/ajv')
 const schema = require('../../contract/notification')(config.i18n.locales.split(','))
 const validate = ajv.compile(schema)
-const axios = require('../utils/axios')
 const asyncWrap = require('../utils/async-wrap')
 const findUtils = require('../utils/find')
 const auth = require('../utils/auth')
@@ -13,8 +12,6 @@ const prometheus = require('../utils/prometheus')
 const urlTemplate = require('url-template')
 const debug = require('debug')('notifications')
 const router = express.Router()
-
-const DIRECTORY_URL = config.privateDirectoryUrl || config.directoryUrl
 
 // Get the list of notifications
 router.get('', auth(), asyncWrap(async (req, res, next) => {
@@ -66,9 +63,10 @@ const prepareNotifSubscription = (originalNotification, subscription) => {
   if (subscription.urlTemplate) {
     notification.url = urlTemplate.parse(subscription.urlTemplate).expand(notification.urlParams || {})
   }
-  if (!notification.topic.title && subscription.topic.title) {
-    notification.topic.title = subscription.topic.title
-  }
+
+  // the subscription topic is better than the notification topic, it might be more general for grouping
+  notification.topic = subscription.topic
+
   // maintain compatibility with deprecated "web" output
   if (notification.outputs && notification.outputs.includes('web')) {
     notification.outputs = notification.outputs.filter(o => o !== 'web').concat(['devices'])
@@ -77,11 +75,13 @@ const prepareNotifSubscription = (originalNotification, subscription) => {
 }
 
 const sendNotification = async (req, notification) => {
+  const db = req.app.get('db')
+
   if (!notification.locale) notification.locale = config.i18n.defaultLocale
   if (!notification.title) notification.title = notification.topic.title || notification.topic.key
   notification = localize(notification)
   global.events.emit('saveNotification', notification)
-  await req.app.get('db').collection('notifications').insertOne(notification)
+  await db.collection('notifications').insertOne(notification)
   debug('Send WS notif', notification.recipient, notification)
   req.app.get('publishWS')([`user:${notification.recipient.id}:notifications`], notification)
   if (notification.outputs && notification.outputs.includes('devices')) {
@@ -93,25 +93,13 @@ const sendNotification = async (req, notification) => {
   }
   if (notification.outputs && notification.outputs.includes('email')) {
     global.events.emit('sentNotification', { output: 'email', notification })
-    debug('Send notif to email address')
-    let text = notification.body || ''
-    let simpleHtml = `<p>${notification.body || ''}</p>`
-    if (notification.url) {
-      text += '\n\n' + notification.url
-      simpleHtml += `<p>${req.__({ phrase: 'seeAt', locale: notification.locale })} <a href="${notification.url}">${new URL(notification.url).host}</a></p>`
-    }
-    const mail = {
-      to: [{ type: 'user', ...notification.recipient }],
-      subject: notification.title,
-      text,
-      html: notification.htmlBody || simpleHtml
-    }
-    debug('Send mail notif', notification.recipient, mail, notification)
+    debug('Queue mail notif', notification.recipient, notification)
     prometheus.sentNotifications.inc({ output: 'mail' })
-    axios.post(DIRECTORY_URL + '/api/mails', mail, { params: { key: config.secretKeys.sendMails } }).catch(err => {
-      console.error('(notif-mail) failed to send mail', err)
-      prometheus.internalError.inc({ errorCode: 'notif-mail' })
-    })
+    await db.collection('mails').updateOne(
+      { _id: notification.recipient.id },
+      { $push: { notifications: notification } },
+      { upsert: true }
+    )
   }
 }
 

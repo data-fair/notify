@@ -7,5 +7,8 @@ module.exports = {
   },
   prometheus: {
     port: 9092
+  },
+  emailsGrouping: {
+    cron: '* * * * * *' // every second
   }
 }

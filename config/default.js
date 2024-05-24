@@ -53,5 +53,8 @@ module.exports = {
   prometheus: {
     active: true,
     port: 9090
+  },
+  emailsGrouping: {
+    cron: '0/4 * * * *' // every 4 minutes
   }
 }

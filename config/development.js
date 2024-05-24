@@ -3,5 +3,8 @@ module.exports = {
     notifications: 'notifications-secret',
     sendMails: 'sendmails-secret'
   },
-  proxyNuxt: true
+  proxyNuxt: true,
+  emailsGrouping: {
+    cron: '0/1 * * * *' // every minute
+  }
 }
