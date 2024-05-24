@@ -18,6 +18,7 @@ const webhooksWorker = require('./webhooks-worker')
 const auth = require('./utils/auth')
 const prometheus = require('./utils/prometheus')
 const emails = require('./utils/emails')
+const digests = require('./utils/digests')
 
 // a global event emitter for testing
 global.events = new EventEmitter()
@@ -86,6 +87,8 @@ app.use((err, req, res, next) => {
 
 /** @type {import('cron').CronJob | null} */
 let emailsGroupingJob
+/** @type {import('cron').CronJob | null} */
+let digestJob
 
 // Run app and return it in a promise
 let wss
@@ -115,13 +118,33 @@ exports.start = async () => {
       console.warn('emailsGrouping lock is already acquired, skip')
     } else {
       for await (const mailsItem of db.collection('mails').find({})) {
-        await emails.sendNotifications(mailsItem.notifications)
+        try {
+          await emails.sendNotifications(mailsItem.notifications)
+        } catch (err) {
+          console.error('(emailsGrouping) error when sending grouped notificaiton email', err, mailsItem)
+          prometheus.internalError.inc({ errorCode: 'emailsGrouping' })
+        }
       }
       await db.collection('mails').deleteMany({})
       await locks.release('emailsGrouping')
     }
   })
   emailsGroupingJob.start()
+
+  digestJob = new CronJob(config.digest.cron, async () => {
+    if (!await locks.acquire('digests')) {
+      console.warn('digests lock is already acquired, skip')
+    } else {
+      try {
+        await digests.sendLastWeekDigest(db)
+      } catch (err) {
+        console.error('(digests) error when sending digests to users', err)
+        prometheus.internalError.inc({ errorCode: 'digests' })
+      }
+      await locks.release('digests')
+    }
+  })
+  digestJob.start()
 
   app.set('db', db)
   app.set('client', client)
@@ -138,6 +161,7 @@ exports.start = async () => {
 
 exports.stop = async () => {
   if (emailsGroupingJob) emailsGroupingJob.stop()
+  if (digestJob) digestJob.stop()
   await webhooksWorker.stop()
   if (wss) ws.stop(wss)
   await httpTerminator.terminate()

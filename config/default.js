@@ -56,5 +56,11 @@ module.exports = {
   },
   emailsGrouping: {
     cron: '0/4 * * * *' // every 4 minutes
+  },
+  digest: {
+    // weekly by default
+    // TODO: make this configurable ?
+    cron: '0 6 * * 7', // six AM every sunday
+    maxItems: 10
   }
 }

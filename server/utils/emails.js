@@ -1,6 +1,5 @@
 const config = require('config')
 const axios = require('./axios')
-const prometheus = require('./prometheus')
 const { i18n } = require('./i18n')
 
 const DIRECTORY_URL = config.privateDirectoryUrl || config.directoryUrl
@@ -8,14 +7,30 @@ const DIRECTORY_URL = config.privateDirectoryUrl || config.directoryUrl
 /**
  * @param {any} notification
  */
-const getNotifMailBody = (notification) => {
-  let text = notification.body || ''
+exports.getNotifMailBody = (notification, withTitle = false) => {
+  let text = ''
+  let html = ''
+  if (withTitle) {
+    text += notification.title
+    if (notification.body) text += '\n\n'
+    html += `<h2>${notification.title}</h2>`
+  }
+  if (notification.body) text += notification.body
+
   let simpleHtml = `<p>${notification.body || ''}</p>`
   if (notification.url) {
     text += '\n\n' + notification.url
     simpleHtml += `<p>${i18n.__({ phrase: 'seeAt', locale: notification.locale })} <a href="${notification.url}">${new URL(notification.url).host}</a></p>`
   }
-  return { text, html: notification.htmlBody || simpleHtml }
+  html += notification.htmlBody || simpleHtml
+  return { text, html }
+}
+
+/**
+ * @param {any} mail
+ */
+exports.sendMail = async (mail) => {
+  await axios.post(DIRECTORY_URL + '/api/mails', mail, { params: { key: config.secretKeys.sendMails } })
 }
 
 /**
@@ -28,23 +43,19 @@ exports.sendNotifications = async (notifications) => {
   if (notifications.length === 1) {
     const notification = notifications[0]
     mail.subject = notification.title
-    Object.assign(mail, getNotifMailBody(notification))
+    Object.assign(mail, exports.getNotifMailBody(notification))
   } else {
     mail.subject = notifications.map(n => n.title).join(', ')
     if (mail.subject.length > 80) mail.subject = mail.subject.slice(0, 80) + '...'
     for (let i = 0; i < notifications.length; i++) {
-      const { text: notifText, html: notifHtml } = getNotifMailBody(notifications[i])
+      const { text: notifText, html: notifHtml } = exports.getNotifMailBody(notifications[i], true)
       if (i > 0) {
-        mail.text += '\n\n'
+        mail.text += '\n----------\n'
         mail.html += '<hr>'
       }
       mail.text += notifText
       mail.html += notifHtml
     }
   }
-
-  axios.post(DIRECTORY_URL + '/api/mails', mail, { params: { key: config.secretKeys.sendMails } }).catch(err => {
-    console.error('(notif-mail) failed to send mail', err)
-    prometheus.internalError.inc({ errorCode: 'notif-mail' })
-  })
+  await exports.sendMail(mail)
 }

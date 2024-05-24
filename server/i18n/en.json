@@ -1,3 +1,5 @@
 {
-	"seeAt": "See at"
+	"seeAt": "See at",
+	"weeklyDigest": "activity digest week {{week}}",
+	"topicCount": "{{title}}: {{count}} events"
 }

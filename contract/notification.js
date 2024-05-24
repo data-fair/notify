@@ -67,6 +67,9 @@ module.exports = (locales, noSingleLocale = false) => {
           }, {
             const: 'email',
             title: 'recevoir la notification par email'
+          }, {
+            const: 'digest',
+            title: 'inclure la notification dans un résumé hebdomadaire'
           }]
         }
       },

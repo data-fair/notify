@@ -10,5 +10,9 @@ module.exports = {
   },
   emailsGrouping: {
     cron: '* * * * * *' // every second
+  },
+  digest: {
+    cron: '* * * * * *', // every second
+    maxItems: 1
   }
 }

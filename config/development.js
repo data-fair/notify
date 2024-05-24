@@ -5,6 +5,9 @@ module.exports = {
   },
   proxyNuxt: true,
   emailsGrouping: {
-    cron: '0/1 * * * *' // every minute
+    cron: '* * * * *' // every minute
+  },
+  digest: {
+    cron: '* * * * *' // every minute
   }
 }

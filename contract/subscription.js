@@ -39,6 +39,9 @@ module.exports = (locales) => ({
         }, {
           const: 'email',
           title: 'recevoir la notification par email'
+        }, {
+          const: 'digest',
+          title: 'inclure la notification dans un résumé hebdomadaire'
         }]
       }
     },

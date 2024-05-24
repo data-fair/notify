@@ -1,3 +1,5 @@
 {
-	"seeAt": "Voir sur"
+	"seeAt": "Voir sur",
+	"weeklyDigest": "résumé de l'activité semaine {{week}}",
+	"topicCount": "{{title}} : {{count}} évènements"
 }
