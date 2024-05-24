@@ -46,6 +46,7 @@ ADD scripts scripts
 ADD upgrade upgrade
 ADD config config
 ADD contract contract
+ADD public/static public/static
 
 # Adding licence, manifests, etc.
 ADD README.md BUILD.json* ./

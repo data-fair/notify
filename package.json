@@ -1,6 +1,6 @@
 {
   "name": "notify",
-  "version": "3.3.5",
+  "version": "3.4.0",
   "description": "A simple server to manage notifications feeds for our users. Notifications are stored and pushed to various channels.",
   "main": "index.js",
   "scripts": {
@@ -63,6 +63,7 @@
     "@data-fair/sd-vue": "2.6.1",
     "@koumoul/vjsf": "^2.11.3",
     "@mdi/font": "^6.6.95",
+    "@nuxt/types": "2.17",
     "@nuxtjs/google-fonts": "^1.3.0",
     "@nuxtjs/vuetify": "^1.12.1",
     "@types/debug": "^4.1.12",

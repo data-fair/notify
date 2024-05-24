@@ -1,4 +1,6 @@
 exports.parseSender = (senderStr) => {
+  if (senderStr === 'none') return senderStr
+
   const senderParts = senderStr.split(':')
   const sender = {
     type: senderParts[0],
