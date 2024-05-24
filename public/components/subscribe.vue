@@ -31,6 +31,16 @@
         value="email"
         @change="sendSubscription(subscription)"
       />
+      <v-checkbox
+        v-if="outputs.includes('digest')"
+        v-model="subscription.outputs"
+        dense
+        hide-details
+        class="ml-10 mt-0"
+        :label="$t('digest')"
+        value="digest"
+        @change="sendSubscription(subscription)"
+      />
     </template>
   </v-col>
 </template>
@@ -39,6 +49,7 @@
 fr:
   devices: notification sur appareils configurés
   email: email
+  digest: résumé hebdomadaire
 </i18n>
 
 <script>

@@ -97,6 +97,7 @@ export default {
         if (this.registrations.find(r => !r.disabled)) outputs.push('devices')
         this.outputs = outputs
       }
+      if (this.$route.query.digest) this.outputs.push('digest')
       this.loading = false
     }
   }
