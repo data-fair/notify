@@ -15,7 +15,7 @@ npm run dev-eps
 sh scripts/init.sh
 npm run dev-client
 npm run dev-server
-docker-compose exec router sh -c "mongo < /scripts/init-sharding.js"
+docker compose exec router sh -c "mongo < /scripts/init-sharding.js"
 ```
 
 When both servers are ready, go to [http://localhost:5994](http://localhost:5994) and chose an account in `test/resources/users.json` to login with its email and password.
