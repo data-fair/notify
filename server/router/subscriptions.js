@@ -70,6 +70,8 @@ router.post('', asyncWrap(async (req, res, next) => {
   const db = req.app.get('db')
 
   req.body.outputs = req.body.outputs || []
+  const { reqOrigin } = await import('@data-fair/lib/express/req-origin.js')
+  req.body.origin = reqOrigin(req)
 
   // maintain compatibility with deprecated "web" output
   if (req.body.outputs.includes('web')) {

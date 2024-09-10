@@ -42,6 +42,10 @@ module.exports = (locales) => ({
         }]
       }
     },
+    origin: {
+      type: 'string',
+      readOnly: true
+    },
     urlTemplate: {
       type: 'string',
       title: 'Template de lien'

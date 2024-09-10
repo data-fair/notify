@@ -22,15 +22,18 @@ describe('Subscriptions', () => {
     await global.ax.user2.post('/api/v1/subscriptions', subscription)
     let res = await global.ax.admin1.get('/api/v1/subscriptions')
     assert.equal(res.data.count, 1)
+    assert.equal(res.data.results[0].origin, 'http://localhost:5994')
 
     res = await global.ax.push.post('/api/v1/notifications', {
       topic: { key: 'topic1' },
       title: 'a notification',
+      body: 'a notification from host {hostname}',
       sender: { type: 'user', id: 'user1' },
       visibility: 'public'
     })
     res = await global.ax.admin1.get('/api/v1/notifications')
     assert.equal(res.data.count, 1)
+    assert.equal(res.data.results[0].body, 'a notification from host localhost')
     res = await global.ax.user1.get('/api/v1/notifications')
     assert.equal(res.data.count, 1)
     res = await global.ax.user2.get('/api/v1/notifications')

@@ -52,7 +52,7 @@ const localize = (notif) => {
   return { ...notif, title: localizeProp(notif.title, notif.locale), body: localizeProp(notif.body, notif.locale), htmlBody: localizeProp(notif.htmlBody, notif.locale) }
 }
 
-const prepareNotifSubscription = (originalNotification, subscription) => {
+const prepareNotifSubscription = async (originalNotification, subscription) => {
   const notification = {
     icon: subscription.icon || config.theme.notificationIcon || config.theme.logo || (config.publicUrl + '/logo-192x192.png'),
     locale: subscription.locale,
@@ -73,6 +73,12 @@ const prepareNotifSubscription = (originalNotification, subscription) => {
   if (notification.outputs && notification.outputs.includes('web')) {
     notification.outputs = notification.outputs.filter(o => o !== 'web').concat(['devices'])
   }
+
+  const { microTemplate } = await import('@data-fair/lib/micro-template.js')
+  const templateParams = { origin: subscription.origin, hostname: new URL(subscription.origin).hostname }
+  if (notification.body) notification.body = microTemplate(notification.body, templateParams)
+  if (notification.htmlBody) notification.htmlBody = microTemplate(notification.htmlBody, templateParams)
+
   return notification
 }
 
@@ -162,7 +168,7 @@ router.post('', asyncWrap(async (req, res, next) => {
   }
   let nbSent = 0
   for await (const subscription of db.collection('subscriptions').find(subscriptionsFilter)) {
-    await sendNotification(req, prepareNotifSubscription(notification, subscription))
+    await sendNotification(req, await prepareNotifSubscription(notification, subscription))
     nbSent += 1
   }
 
