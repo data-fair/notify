@@ -63,5 +63,7 @@ ENV DEBUG db,upgrade*
 VOLUME /webapp/security
 EXPOSE 8080
 
+RUN chmod -R 777 ./nuxt-dist 
+
 CMD ["dumb-init", "node", "--max-http-header-size", "64000", "server"]
 
