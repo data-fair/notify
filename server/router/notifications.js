@@ -147,27 +147,32 @@ router.post('', asyncWrap(async (req, res, next) => {
   // prepare the filter to find the topics matching this subscription
   const topicParts = notification.topic.key.split(':')
   const topicKeys = topicParts.map((part, i) => topicParts.slice(0, i + 1).join(':'))
-  const subscriptionsFilter = { 'topic.key': { $in: topicKeys } }
-  if (notification.visibility === 'private') subscriptionsFilter.visibility = 'private'
+  const subscriptionsFilters = [{ 'topic.key': { $in: topicKeys } }]
+  if (notification.visibility === 'private') subscriptionsFilters.push({ visibility: 'private' })
   if (notification.sender) {
-    subscriptionsFilter['sender.type'] = notification.sender.type
-    subscriptionsFilter['sender.id'] = notification.sender.id
-    if (notification.sender.role) subscriptionsFilter['sender.role'] = notification.sender.role
+    subscriptionsFilters.push({ 'sender.type': notification.sender.type })
+    subscriptionsFilters.push({ 'sender.id': notification.sender.id })
+    if (notification.sender.role) subscriptionsFilters({ 'sender.role': notification.sender.role })
     if (notification.sender.department) {
       if (notification.sender.department !== '*') {
-        subscriptionsFilter['sender.department'] = notification.sender.department
+        subscriptionsFilters.push({
+          $or: [
+            { 'sender.department': notification.sender.department },
+            { 'sender.department': { $exists: false } }
+          ]
+        })
       }
     } else {
-      subscriptionsFilter['sender.department'] = { $exists: false }
+      subscriptionsFilters.push({ 'sender.department': { $exists: false } })
     }
   } else {
-    subscriptionsFilter.sender = { $exists: false }
+    subscriptionsFilters.push({ sender: { $exists: false } })
   }
   if (notification.recipient) {
-    subscriptionsFilter['recipient.id'] = notification.recipient.id
+    subscriptionsFilters.push({ 'recipient.id': notification.recipient.id })
   }
   let nbSent = 0
-  for await (const subscription of db.collection('subscriptions').find(subscriptionsFilter)) {
+  for await (const subscription of db.collection('subscriptions').find({ $and: subscriptionsFilters })) {
     await sendNotification(req, await prepareNotifSubscription(notification, subscription))
     nbSent += 1
   }
@@ -178,9 +183,8 @@ router.post('', asyncWrap(async (req, res, next) => {
     await sendNotification(req, notification)
   }
 
-  const webhookSubscriptionssFilter = { ...subscriptionsFilter }
-  delete webhookSubscriptionssFilter['recipient.id']
-  for await (const webhookSubscription of db.collection('webhook-subscriptions').find(webhookSubscriptionssFilter)) {
+  const webhookSubscriptionssFilter = subscriptionsFilters.filter(f => !f['recipient.id'])
+  for await (const webhookSubscription of db.collection('webhook-subscriptions').find({ $and: webhookSubscriptionssFilter })) {
     await createWebhook(req, notification, webhookSubscription)
   }
 
