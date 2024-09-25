@@ -152,7 +152,7 @@ router.post('', asyncWrap(async (req, res, next) => {
   if (notification.sender) {
     subscriptionsFilters.push({ 'sender.type': notification.sender.type })
     subscriptionsFilters.push({ 'sender.id': notification.sender.id })
-    if (notification.sender.role) subscriptionsFilters({ 'sender.role': notification.sender.role })
+    if (notification.sender.role) subscriptionsFilters.push({ 'sender.role': notification.sender.role })
     if (notification.sender.department) {
       if (notification.sender.department !== '*') {
         subscriptionsFilters.push({
