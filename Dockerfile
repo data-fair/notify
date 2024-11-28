@@ -1,8 +1,9 @@
 ######################################
 # Stage: nodejs dependencies and build
-FROM node:20.10.0-alpine3.18 AS builder
+FROM node:20.18.1-alpine3.20 AS builder
 
 WORKDIR /webapp
+COPY patches patches
 ADD package.json .
 ADD package-lock.json .
 # use clean-modules on the same line as npm ci to be lighter in the cache
