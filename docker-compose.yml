@@ -5,6 +5,7 @@ services:
       - dev
       - test
     image: ghcr.io/data-fair/simple-directory:7
+    platform: linux/amd64
     network_mode: host
     depends_on:
       - mongo
@@ -29,6 +30,7 @@ services:
     profiles:
       - dev
     image: ghcr.io/data-fair/openapi-viewer:1
+    platform: linux/amd64
     ports:
       - 5680:8080
 

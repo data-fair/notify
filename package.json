@@ -14,7 +14,8 @@
     "test-deps": "docker compose --profile test up -d --wait --quiet-pull",
     "test": "NODE_ENV=test mocha --exit --timeout 10000",
     "quality": "npm run test-deps && npm run lint && npm run test && npm audit --omit=dev --audit-level=critical",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "postinstall": "patch-package"
   },
   "engines": {
     "node": "v20"
@@ -82,6 +83,7 @@
     "mocha": "^6.2.3",
     "nodemon": "^2",
     "nuxt": "^2.17.4",
+    "patch-package": "^8.0.0",
     "reconnecting-websocket": "^4.2.0",
     "typescript": "^5.4.5",
     "vue-moment": "^4.1.0",
@@ -118,11 +120,14 @@
     "semver-extract": "^1.1.1",
     "url-template": "^2.0.8",
     "useragent": "^2.3.0",
-    "ws": "^7.5.9"
+    "ws": "^7.5.10"
   },
   "overrides": {
-    "node-pushnotifications": {
-      "node-gcm": "1.1.2"
+    "node-gcm": {
+      "axios": "^1.7"
+    },
+    "@nuxtjs/axios": {
+      "axios": "0"
     },
     "@data-fair/lib": {
       "vue": "2.7.16",
@@ -131,7 +136,7 @@
       "vue-router": "3.6.5",
       "mongodb": "$mongodb",
       "prom-client": "$prom-client",
-      "ws": "7.5.9"
+      "ws": "$ws"
     }
   }
 }
