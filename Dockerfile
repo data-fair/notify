@@ -1,6 +1,11 @@
+############################################################################################################
+# Stage: prepare a base image with all native utils pre-installed, used both by builder and definitive image
+FROM node:20.18.1-alpine3.20 AS base
+RUN apk add --no-cache curl
+RUN npm i -g npm@10
 ######################################
 # Stage: nodejs dependencies and build
-FROM node:20.18.1-alpine3.20 AS builder
+FROM base AS builder
 
 WORKDIR /webapp
 COPY patches patches
@@ -30,7 +35,7 @@ RUN npm prune --production && rm -rf node_modules/.cache
 
 ##################################
 # Stage: main nodejs service stage
-FROM node:20.10.0-alpine3.18
+FROM base
 MAINTAINER "contact@koumoul.com"
 
 RUN apk add --no-cache dumb-init
@@ -64,7 +69,7 @@ ENV DEBUG db,upgrade*
 VOLUME /webapp/security
 EXPOSE 8080
 
-RUN chmod -R 777 ./nuxt-dist 
+RUN chmod -R 777 ./nuxt-dist
 
 CMD ["dumb-init", "node", "--max-http-header-size", "64000", "server"]
 
