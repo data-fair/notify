@@ -1,5 +1,6 @@
 let config = { ...require('config') }
-config.basePath = new URL(config.publicUrl + '/').pathname
+
+config.basePath = process.env.NODE_ENV === 'development' ? '' : `${process.env.PREFIX || ''}/notify`
 
 const locales = ['fr', 'en', 'de', 'it', 'es', 'pt']
 
