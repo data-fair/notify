@@ -46,7 +46,7 @@ module.exports = {
     // Necessary for "à la carte" import of vuetify components
     transpile: [/@koumoul/, /@data-fair/],
     // always the same url to fetch static resource, event in multi-domain mode
-    publicPath: config.basePath + '/_nuxt/',
+    publicPath: '_nuxt/',
     extend (config, { isServer, isDev, isClient }) {
       const webpack = require('webpack')
 
