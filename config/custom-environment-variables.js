@@ -61,5 +61,6 @@ module.exports = {
       __format: 'json'
     },
     port: 'PROMETHEUS_PORT'
-  }
+  },
+  prefix: 'PREFIX'
 }

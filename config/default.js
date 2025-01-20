@@ -53,5 +53,6 @@ module.exports = {
   prometheus: {
     active: true,
     port: 9090
-  }
+  },
+  prefix: ''
 }

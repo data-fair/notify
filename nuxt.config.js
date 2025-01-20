@@ -1,6 +1,6 @@
 let config = { ...require('config') }
 
-config.basePath = process.env.NODE_ENV === 'development' ? '' : `${process.env.PREFIX || ''}/notify`
+config.basePath = process.env.NODE_ENV === 'development' ? '' : `${config.prefix}/notify`
 
 const locales = ['fr', 'en', 'de', 'it', 'es', 'pt']
 
@@ -84,7 +84,9 @@ module.exports = {
     }
   }]],
   axios: {
-    browserBaseURL: config.basePath
+    browserBaseURL: '/',
+    baseURL: config.basePath,
+    credentials: true
   },
   buildModules: [
     '@nuxtjs/vuetify',
@@ -93,7 +95,7 @@ module.exports = {
   vuetify: vuetifyOptions,
   env: {
     basePath: config.basePath,
-    directoryUrl: config.directoryUrl,
+    directoryUrl: `${config.prefix}/simple-directory`,
     theme: config.theme,
     i18n: config.i18n
   },
