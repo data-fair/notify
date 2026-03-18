@@ -1,4 +1,8 @@
 # notify
+
+> [!WARNING]                                                                                                                                                                         
+> **This project is deprecated.** It has been replaced by [events](https://github.com/data-fair/events). 
+
 A simple server to manage notifications feeds for our users. Notifications are stored and pushed to various channels.
 
 ## Sponsors
